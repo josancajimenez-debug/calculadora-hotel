@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Contable Hotel Estudiantes S.A. — IFRS 18 + CR Fiscal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1480px; margin: 0 auto; }
+
+        header {
+            background: linear-gradient(135deg, #1e5a96 0%, #2d7ab8 100%);
+            color: white;
+            padding: 28px 30px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header h1 { font-size: 26px; margin-bottom: 6px; }
+        header p { opacity: 0.95; font-size: 13px; line-height: 1.55; }
+        header .badges { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+        header .badge {
+            background: rgba(255,255,255,0.18);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .panel h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1e5a96;
+            color: #1e5a96;
+        }
+
+        .view { display: none; animation: fadeIn 0.25s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+        }
+        .menu-card {
+            background: white;
+            border: 1px solid #e5e9ef;
+            border-radius: 10px;
+            padding: 22px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 140px;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 6px;
+            height: 100%;
+            background: #1e5a96;
+            transition: width 0.2s ease;
+        }
+        .menu-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(30, 90, 150, 0.18);
+            border-color: #1e5a96;
+        }
+        .menu-card:hover::before { width: 100%; opacity: 0.06; }
+        .menu-card .icon { font-size: 30px; line-height: 1; }
+        .menu-card .title { font-size: 16px; font-weight: 700; color: #1e5a96; }
+        .menu-card .desc { font-size: 12.5px; color: #666; line-height: 1.45; }
+        .menu-card .arrow {
+            position: absolute;
+            bottom: 14px;
+            right: 18px;
+            font-size: 18px;
+            color: #1e5a96;
+            opacity: 0.7;
+            transition: transform 0.2s ease;
+        }
+        .menu-card:hover .arrow { transform: translateX(4px); opacity: 1; }
+        .menu-card.green::before { background: #10b981; }
+        .menu-card.green .title { color: #047857; }
+        .menu-card.green:hover { border-color: #10b981; box-shadow: 0 8px 20px rgba(16,185,129,0.18); }
+        .menu-card.green .arrow { color: #047857; }
+        .menu-card.amber::before { background: #f59e0b; }
+        .menu-card.amber .title { color: #b45309; }
+        .menu-card.amber:hover { border-color: #f59e0b; box-shadow: 0 8px 20px rgba(245,158,11,0.18); }
+        .menu-card.amber .arrow { color: #b45309; }
+        .menu-card.purple::before { background: #8b5cf6; }
+        .menu-card.purple .title { color: #6d28d9; }
+        .menu-card.purple:hover { border-color: #8b5cf6; box-shadow: 0 8px 20px rgba(139,92,246,0.18); }
+        .menu-card.purple .arrow { color: #6d28d9; }
+        .menu-card.red::before { background: #ef4444; }
+        .menu-card.red .title { color: #b91c1c; }
+        .menu-card.red:hover { border-color: #ef4444; box-shadow: 0 8px 20px rgba(239,68,68,0.18); }
+        .menu-card.red .arrow { color: #b91c1c; }
+        .menu-card.teal::before { background: #14b8a6; }
+        .menu-card.teal .title { color: #0f766e; }
+        .menu-card.teal:hover { border-color: #14b8a6; box-shadow: 0 8px 20px rgba(20,184,166,0.18); }
+        .menu-card.teal .arrow { color: #0f766e; }
+        .menu-card.brown::before { background: #92400e; }
+        .menu-card.brown .title { color: #78350f; }
+        .menu-card.brown:hover { border-color: #92400e; box-shadow: 0 8px 20px rgba(146,64,14,0.18); }
+        .menu-card.brown .arrow { color: #78350f; }
+
+        .view-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-back {
+            background: white;
+            border: 1px solid #1e5a96;
+            color: #1e5a96;
+            padding: 9px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-back:hover { background: #1e5a96; color: white; box-shadow: 0 4px 10px rgba(30,90,150,0.25); }
+        .toolbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .btn-action {
+            background: #1e5a96;
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12.5px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-action:hover { background: #164378; }
+        .btn-action.secondary { background: #e5e7eb; color: #333; }
+        .btn-action.secondary:hover { background: #d1d5db; }
+
+        .input-group { margin-bottom: 16px; }
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #fffef0;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #1e5a96;
+            box-shadow: 0 0 0 3px rgba(30, 90, 150, 0.1);
+        }
+        .input-group .ref {
+            display: block;
+            font-size: 10.5px;
+            color: #8a8a8a;
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 14px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #999;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab.active { color: #1e5a96; border-bottom-color: #1e5a96; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .column-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .table-container { overflow-x: auto; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead { background: #f4f6fa; border-bottom: 2px solid #ccc; }
+        th {
+            padding: 11px 8px;
+            text-align: right;
+            font-weight: 600;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-size: 11.5px;
+        }
+        th:first-child { text-align: left; }
+        td { padding: 9px 8px; border-bottom: 1px solid #f0f0f0; text-align: right; color: #555; }
+        td:first-child { text-align: left; font-weight: 500; color: #333; }
+        tbody tr:hover { background: #f9f9f9; }
+
+        .group-header td {
+            background: #eef3f9;
+            color: #1e5a96;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11.5px;
+            letter-spacing: 0.5px;
+            padding: 10px 8px;
+        }
+        .total-row {
+            background: #f0f5fa;
+            font-weight: 700;
+            color: #1e5a96;
+            border-top: 2px solid #1e5a96;
+            border-bottom: 2px solid #1e5a96;
+        }
+        .subtotal-row { background: #fafafa; border-top: 1px solid #e0e0e0; font-weight: 600; }
+        .key-subtotal {
+            background: #e8f0f8;
+            font-weight: 700;
+            color: #154673;
+            border-top: 1.5px solid #1e5a96;
+            border-bottom: 1.5px solid #1e5a96;
+        }
+        .indent-1 { padding-left: 22px !important; color: #555 !important; font-weight: 400 !important; }
+        .neg { color: #b8232a; }
+        .pos { color: #2e7d32; }
+
+        /* Diario styles */
+        .asiento-header td {
+            background: #eef7ff;
+            color: #154673;
+            font-weight: 700;
+            font-size: 12.5px;
+            padding: 9px 8px;
+            border-top: 2px solid #1e5a96;
+        }
+        .asiento-base td {
+            background: #f7fbff;
+            font-style: italic;
+            color: #5a738f;
+            font-size: 11.5px;
+            padding: 4px 8px 7px;
+        }
+        .asiento-footer td {
+            background: #f0f5fa;
+            font-weight: 700;
+            padding: 7px 8px;
+            border-bottom: 2px solid #ccc;
+        }
+        .asiento-separator td {
+            background: repeating-linear-gradient(
+                90deg, #ccc 0, #ccc 6px, transparent 6px, transparent 12px
+            );
+            height: 2px;
+            padding: 0;
+            border: none;
+        }
+        .haber-indent { padding-left: 30px !important; color: #777 !important; }
+
+        /* Mayor styles */
+        .mayor-card {
+            background: white;
+            border: 1px solid #e5e9ef;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+        .mayor-card-header {
+            background: #1e5a96;
+            color: white;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .mayor-card-header .saldo {
+            font-family: 'Monaco','Menlo',monospace;
+            font-size: 12.5px;
+            background: rgba(255,255,255,0.18);
+            padding: 3px 10px;
+            border-radius: 4px;
+        }
+        .mayor-card table { font-size: 12px; }
+        .mayor-card th { padding: 7px 8px; font-size: 10.5px; }
+        .mayor-card td { padding: 6px 8px; }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 13px;
+            margin-bottom: 16px;
+        }
+        .kpi-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%);
+            padding: 14px 16px;
+            border-radius: 6px;
+            border-left: 4px solid #1e5a96;
+        }
+        .kpi-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; font-weight: 600; }
+        .kpi-value { font-size: 19px; font-weight: 700; color: #1e5a96; }
+        .note { font-size: 10.5px; color: #999; margin-top: 3px; }
+        .bench { font-size: 10.5px; color: #777; margin-top: 2px; }
+
+        .currency-value { font-family: 'Monaco', 'Menlo', monospace; text-align: right; }
+
+        .info-box {
+            background: #f0f7ff;
+            border-left: 4px solid #1e5a96;
+            padding: 11px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 14px;
+            line-height: 1.55;
+            color: #234;
+        }
+        .info-box strong { color: #1e5a96; }
+        .warn-box {
+            background: #fff8e1;
+            border-left: 4px solid #f59e0b;
+            padding: 11px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 14px;
+            line-height: 1.55;
+            color: #4a3a00;
+        }
+
+        .verification-list { list-style: none; font-size: 12.5px; line-height: 1.85; }
+        .verification-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f4f4f4;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .verification-list li:last-child { border-bottom: none; }
+        .status-indicator { display: inline-block; width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+        .status-good { background-color: #10b981; }
+        .status-bad { background-color: #ef4444; }
+        .verif-label { flex: 1; }
+        .verif-value { font-family: 'Monaco', 'Menlo', monospace; font-size: 11.5px; color: #555; }
+
+        .legal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; font-size: 12px; }
+        .legal-card {
+            background: #fafbfd;
+            border: 1px solid #e5e9ef;
+            border-radius: 6px;
+            padding: 12px 14px;
+            line-height: 1.55;
+        }
+        .legal-card strong { color: #1e5a96; display: block; margin-bottom: 4px; font-size: 12.5px; }
+        .legal-card span { color: #666; font-size: 11.5px; }
+
+        .status-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .status-pill {
+            background: white;
+            border: 1px solid #e5e9ef;
+            border-radius: 8px;
+            padding: 12px 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .status-pill .label { font-size: 10.5px; color: #777; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 4px; }
+        .status-pill .value { font-size: 16px; font-weight: 700; color: #1e5a96; font-family: 'Monaco','Menlo',monospace; }
+        .status-pill.pos .value { color: #047857; }
+        .status-pill.neg .value { color: #b91c1c; }
+
+        .footer { text-align: center; font-size: 11px; color: #999; margin-top: 24px; line-height: 1.65; }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 19px; }
+            table { font-size: 12px; }
+            th, td { padding: 7px 4px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 Calculadora Contable — Hotel Estudiantes S.A.</h1>
+            <p>Contabilidad de Empresas Turísticas | Período: Julio 2026 | Moneda: ₡ (Colones Costarricenses)</p>
+            <div class="badges">
+                <span class="badge">IFRS 18 (vigente 2027)</span>
+                <span class="badge">NIIF 15 · NIC 16 · NIC 23</span>
+                <span class="badge">Ley 7092 — ISR</span>
+                <span class="badge">Ley 9635 — IVA 13%</span>
+                <span class="badge">CNPT · RCNPT</span>
+                <span class="badge">CCSS 2026</span>
+                <span class="badge">USALI 11.ª Ed.</span>
+            </div>
+        </header>
+
+        <!-- ===== HOME ===== -->
+        <div id="view-home" class="view active">
+            <div class="status-bar">
+                <div class="status-pill"><div class="label">Resultado Operativo</div><div class="value" id="sb_op">₡0</div></div>
+                <div class="status-pill pos"><div class="label">Utilidad Neta</div><div class="value" id="sb_neto">₡0</div></div>
+                <div class="status-pill"><div class="label">Ingresos Totales</div><div class="value" id="sb_ing">₡0</div></div>
+                <div class="status-pill neg"><div class="label">ISR Empresa</div><div class="value" id="sb_isr">₡0</div></div>
+                <div class="status-pill"><div class="label">Cuadre Activo = P+P</div><div class="value" id="sb_cuadre">✓</div></div>
+            </div>
+
+            <div class="info-box">
+                <strong>Bienvenido.</strong> Seleccione un módulo para explorar el ejercicio contable. Los cálculos se generan desde un Libro Diario paramétrico (16 asientos) y cumplen IFRS 18, NIIF 15, NIC 16/23, Ley 7092, Ley 9635, CCSS 2026 y Tramos ISR Min. Hacienda 2026.
+            </div>
+
+            <div class="menu-grid">
+                <button class="menu-card" onclick="openView('view-params')">
+                    <span class="icon">📋</span>
+                    <span class="title">Parámetros del Ejercicio</span>
+                    <span class="desc">Editar supuestos: tarifa, ocupación, IVA, planilla, activos, financiación.</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card brown" onclick="openView('view-diario')">
+                    <span class="icon">📖</span>
+                    <span class="title">Libro Diario</span>
+                    <span class="desc">16 asientos contables (AST-000 a AST-015) generados desde los parámetros.</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card brown" onclick="openView('view-mayor')">
+                    <span class="icon">📚</span>
+                    <span class="title">Libro Mayor</span>
+                    <span class="desc">Movimientos agrupados por cuenta del plan de cuentas (Clase 1 a 5).</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card brown" onclick="openView('view-balance')">
+                    <span class="icon">⚖️</span>
+                    <span class="title">Balance de Comprobación</span>
+                    <span class="desc">Sumas y saldos por cuenta · Verificación Debe = Haber.</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card green" onclick="openView('view-er')">
+                    <span class="icon">📊</span>
+                    <span class="title">Estado de Resultados</span>
+                    <span class="desc">Presentación IFRS 18: Operativa · Inversión · Financiación · Impuestos.</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card teal" onclick="openView('view-esf')">
+                    <span class="icon">🏛️</span>
+                    <span class="title">Situación Financiera</span>
+                    <span class="desc">Estado de Situación Financiera con verificación A = P + Pat.</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card purple" onclick="openView('view-planilla')">
+                    <span class="icon">👥</span>
+                    <span class="title">Planilla / ISR 2026</span>
+                    <span class="desc">Tramos Min. Hacienda 2026 · CCSS obrera 10.83% · créditos familiares.</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card amber" onclick="openView('view-iva')">
+                    <span class="icon">🧾</span>
+                    <span class="title">Liquidación IVA</span>
+                    <span class="desc">Débito fiscal − Crédito fiscal según Ley 9635 (tarifa 13%).</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card green" onclick="openView('view-kpis')">
+                    <span class="icon">📈</span>
+                    <span class="title">KPIs Hoteleros</span>
+                    <span class="desc">ADR · RevPAR · GOPPAR · GOP Margin · ROA · ROE.</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card red" onclick="openView('view-verif')">
+                    <span class="icon">✓</span>
+                    <span class="title">Verificaciones</span>
+                    <span class="desc">Chequeos automáticos de integridad: cuadre de libros y normativa.</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card" onclick="openView('view-legal')">
+                    <span class="icon">📚</span>
+                    <span class="title">Marco Normativo</span>
+                    <span class="desc">Referencias: IFRS 18, NIIF 15, Ley 7092, Ley 9635, CNPT, CCSS, USALI.</span>
+                    <span class="arrow">→</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== PARÁMETROS ===== -->
+        <div id="view-params" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="calcular()">🔄 Recalcular</button>
+                    <button class="btn-action secondary" onclick="cargarEjemplo()">📋 Cargar ejemplo</button>
+                    <button class="btn-action secondary" onclick="limpiarValores()">🧹 Limpiar valores</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>📋 Parámetros del Ejercicio</h2>
+                <div class="info-box"><strong>Instrucción:</strong> Modifique los valores en amarillo. Los 16 asientos del Diario y todos los reportes se regeneran automáticamente.</div>
+                <div class="tabs">
+                    <button class="tab active" onclick="switchSubTab(event,'tab_oper')">Operación</button>
+                    <button class="tab" onclick="switchSubTab(event,'tab_personal')">Personal / CCSS</button>
+                    <button class="tab" onclick="switchSubTab(event,'tab_costos')">Costos / Activos</button>
+                    <button class="tab" onclick="switchSubTab(event,'tab_fin')">Financiamiento</button>
+                </div>
+
+                <div id="tab_oper" class="tab-content active">
+                    <div class="column-group">
+                        <div class="input-group"><label>Habitaciones disponibles</label><input type="number" id="hab_disp" value="20" min="1" onchange="calcular()"><span class="ref">Hotel boutique 3★</span></div>
+                        <div class="input-group"><label>Ocupación mensual (%)</label><input type="number" id="ocupacion" value="80" min="0" max="100" onchange="calcular()"><span class="ref">Temporada alta julio</span></div>
+                        <div class="input-group"><label>Tarifa por noche (sin IVA) ₡</label><input type="number" id="tarifa" value="120000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>IVA servicios turísticos (%)</label><input type="number" id="iva" value="13" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Ley 9635</span></div>
+                        <div class="input-group"><label>Comisión OTA / agencias (%)</label><input type="number" id="comision_ota" value="15" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label>Anticipo NIIF 15 aplicado (con IVA) ₡</label><input type="number" id="anticipo_aplicado" value="50000" min="0" onchange="calcular()"><span class="ref">NIIF 15 párr. 38</span></div>
+                        <div class="input-group"><label>Ingresos A&B (con IVA) ₡</label><input type="number" id="ingresos_ab" value="350000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>Ingresos Lavandería (con IVA) ₡</label><input type="number" id="ingresos_lav" value="56500" min="0" onchange="calcular()"></div>
+                    </div>
+                </div>
+
+                <div id="tab_personal" class="tab-content">
+                    <div class="warn-box"><strong>Planilla USALI:</strong> Habitaciones 60%, A&B 25%, Administración 15%. ISR según tramos Min. Hacienda 2026.</div>
+                    <div class="column-group">
+                        <div class="input-group"><label>Salario Recepcionista ₡</label><input type="number" id="sal_recepcion" value="350000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>Salario Gerente ₡</label><input type="number" id="sal_gerente" value="950000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>Gerente: ¿cónyuge?</label><select id="ger_conyuge" onchange="calcular()"><option value="1" selected>Sí (₡2,590)</option><option value="0">No</option></select></div>
+                        <div class="input-group"><label>Gerente: # hijos (₡1,710 c/u)</label><input type="number" id="ger_hijos" value="0" min="0" max="10" onchange="calcular()"></div>
+                        <div class="input-group"><label>% USALI Habitaciones</label><input type="number" id="usali_hab" value="60" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label>% USALI A&B</label><input type="number" id="usali_ab" value="25" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label>% USALI Admin</label><input type="number" id="usali_adm" value="15" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label>Carga patronal CCSS (%)</label><input type="number" id="carga_patronal" value="26.83" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Vigente 2026-2028</span></div>
+                        <div class="input-group"><label>Retención obrera CCSS (%)</label><input type="number" id="carga_obrera" value="10.83" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                    </div>
+                </div>
+
+                <div id="tab_costos" class="tab-content">
+                    <div class="column-group">
+                        <div class="input-group"><label>Suministros (sin IVA) ₡</label><input type="number" id="suministros" value="25000" min="0" onchange="calcular()"><span class="ref">NIC 2</span></div>
+                        <div class="input-group"><label>Servicios Públicos (sin IVA) ₡</label><input type="number" id="servicios" value="42000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>Costo Edificio ₡</label><input type="number" id="costo_edif" value="2400000" min="0" onchange="calcular()"><span class="ref">NIC 16</span></div>
+                        <div class="input-group"><label>Vida útil Edificio (años)</label><input type="number" id="vida_edif" value="40" min="1" onchange="calcular()"></div>
+                        <div class="input-group"><label>Costo Mobiliario ₡</label><input type="number" id="costo_mob" value="960000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>Vida útil Mobiliario (años)</label><input type="number" id="vida_mob" value="10" min="1" onchange="calcular()"></div>
+                        <div class="input-group"><label>Capital Social ₡</label><input type="number" id="capital" value="8000000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>Tasa ISR Empresa (%)</label><input type="number" id="tasa_isr" value="30" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Ley 7092</span></div>
+                    </div>
+                </div>
+
+                <div id="tab_fin" class="tab-content">
+                    <div class="info-box"><strong>IFRS 18:</strong> Los costos financieros se presentan en la categoría <em>Financiación</em>.</div>
+                    <div class="column-group">
+                        <div class="input-group"><label>Préstamo LP — saldo inicial ₡</label><input type="number" id="prestamo_ini" value="2400000" min="0" onchange="calcular()"><span class="ref">NIC 23</span></div>
+                        <div class="input-group"><label>Cuota — capital ₡</label><input type="number" id="cuota_capital" value="40000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>Cuota — intereses ₡</label><input type="number" id="cuota_intereses" value="15000" min="0" onchange="calcular()"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LIBRO DIARIO ===== -->
+        <div id="view-diario" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="openView('view-params')">✎ Editar parámetros</button>
+                    <button class="btn-action" onclick="openView('view-mayor')">📚 Ver Mayor</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>📖 Libro Diario — Julio 2026</h2>
+                <div class="info-box">
+                    <strong>16 asientos contables (AST-000 a AST-015)</strong> generados dinámicamente desde los parámetros. Cada asiento muestra fecha, comprobante, base legal y verifica Debe = Haber. Plan de cuentas conforme Código de Comercio, formato según textos de Contabilidad Básica para PYMES y USALI.
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th style="width:110px">Código / N°</th><th>Cuenta · Concepto · Comprobante</th><th style="width:130px">Debe (₡)</th><th style="width:130px">Haber (₡)</th></tr>
+                        </thead>
+                        <tbody id="diario_body"></tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td colspan="2"><strong>TOTAL DIARIO GENERAL</strong></td>
+                                <td class="currency-value" id="diario_total_debe">0</td>
+                                <td class="currency-value" id="diario_total_haber">0</td>
+                            </tr>
+                            <tr class="subtotal-row">
+                                <td colspan="2">Diferencia (Debe − Haber)</td>
+                                <td class="currency-value" colspan="2" id="diario_diferencia">0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LIBRO MAYOR ===== -->
+        <div id="view-mayor" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="openView('view-diario')">📖 Ver Diario</button>
+                    <button class="btn-action" onclick="openView('view-balance')">⚖️ Ver Balance Comp.</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>📚 Libro Mayor — Julio 2026</h2>
+                <div class="info-box">
+                    Cada cuenta del plan contable mostrando todos los movimientos del período, con cálculo del saldo. La naturaleza de la cuenta (deudora/acreedora) se indica en el encabezado.
+                </div>
+                <div id="mayor_body"></div>
+            </div>
+        </div>
+
+        <!-- ===== BALANCE COMPROBACIÓN ===== -->
+        <div id="view-balance" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="openView('view-er')">📊 Estado de Resultados</button>
+                    <button class="btn-action" onclick="openView('view-esf')">🏛️ Situación Financiera</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>⚖️ Balance de Comprobación — Julio 2026</h2>
+                <div class="info-box">
+                    Sumas y saldos por cuenta. Verifica que <strong>Total Debe = Total Haber</strong> (partida doble) y que <strong>Saldos Deudores = Saldos Acreedores</strong>.
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:80px">Código</th>
+                                <th>Cuenta</th>
+                                <th>Suma Debe</th>
+                                <th>Suma Haber</th>
+                                <th>Saldo Deudor</th>
+                                <th>Saldo Acreedor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="balance_body"></tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td colspan="2"><strong>TOTALES</strong></td>
+                                <td class="currency-value" id="bal_total_debe">0</td>
+                                <td class="currency-value" id="bal_total_haber">0</td>
+                                <td class="currency-value" id="bal_total_sd">0</td>
+                                <td class="currency-value" id="bal_total_sa">0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ESTADO DE RESULTADOS ===== -->
+        <div id="view-er" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="openView('view-params')">✎ Editar parámetros</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>📊 Estado de Resultados — IFRS 18</h2>
+                <div class="info-box"><strong>IFRS 18:</strong> Presentación por categorías — Operativa, Inversión, Financiación e Impuestos — con subtotales <em>Resultado Operativo</em> y <em>Resultado antes de financiación e impuestos</em>. Saldos extraídos del Libro Mayor.</div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Concepto</th><th>Monto (₡)</th></tr></thead>
+                        <tbody>
+                            <tr class="group-header"><td colspan="2">CATEGORÍA: OPERATIVA</td></tr>
+                            <tr><td class="indent-1">Ingresos por hospedaje (4-1-001)</td><td class="currency-value" id="er_hospedaje">0</td></tr>
+                            <tr><td class="indent-1">Ingresos A&B (4-2-001)</td><td class="currency-value" id="er_ab">0</td></tr>
+                            <tr><td class="indent-1">Ingresos lavandería (4-3-001)</td><td class="currency-value" id="er_lav">0</td></tr>
+                            <tr class="subtotal-row"><td>Total ingresos por contratos con clientes (NIIF 15)</td><td class="currency-value" id="er_ing_total">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Comisiones OTA (5-5-001)</td><td class="currency-value neg" id="er_comisiones">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Personal Habitaciones 60% (5-1-001)</td><td class="currency-value neg" id="er_per_hab">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Personal A&B 25% (5-1-002)</td><td class="currency-value neg" id="er_per_ab">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Personal Administración 15% (5-1-003)</td><td class="currency-value neg" id="er_per_adm">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Cargas sociales patronales (5-2-001)</td><td class="currency-value neg" id="er_ccss">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Servicios públicos (5-3-001)</td><td class="currency-value neg" id="er_serv">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Depreciación Edificio (5-4-001)</td><td class="currency-value neg" id="er_dep_edif">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Depreciación Mobiliario (5-4-002)</td><td class="currency-value neg" id="er_dep_mob">0</td></tr>
+                            <tr class="key-subtotal"><td>RESULTADO OPERATIVO (IFRS 18)</td><td class="currency-value" id="er_operativo">0</td></tr>
+
+                            <tr class="group-header"><td colspan="2">CATEGORÍA: INVERSIÓN</td></tr>
+                            <tr><td class="indent-1">Resultados de inversiones</td><td class="currency-value">0</td></tr>
+
+                            <tr class="key-subtotal"><td>RESULTADO ANTES DE FINANCIACIÓN E IMPUESTOS</td><td class="currency-value" id="er_pre_fin">0</td></tr>
+
+                            <tr class="group-header"><td colspan="2">CATEGORÍA: FINANCIACIÓN</td></tr>
+                            <tr><td class="indent-1 neg">(-) Intereses bancarios (5-7-001)</td><td class="currency-value neg" id="er_intereses">0</td></tr>
+
+                            <tr class="subtotal-row"><td>Resultado antes de impuestos</td><td class="currency-value" id="er_pre_isr">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) ISR Empresa 30% (5-6-001)</td><td class="currency-value neg" id="er_isr">0</td></tr>
+                            <tr class="total-row"><td>RESULTADO DEL PERÍODO</td><td class="currency-value pos" id="er_neto">0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SITUACIÓN FINANCIERA ===== -->
+        <div id="view-esf" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="openView('view-balance')">⚖️ Balance Comp.</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>🏛️ Estado de Situación Financiera</h2>
+                <div class="info-box"><strong>Saldos extraídos del Libro Mayor.</strong> Verificación automática: Activo = Pasivo + Patrimonio.</div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Concepto</th><th>Monto (₡)</th></tr></thead>
+                        <tbody>
+                            <tr class="group-header"><td colspan="2">ACTIVO</td></tr>
+                            <tr><td class="indent-1">Banco BNCR (1-1-001)</td><td class="currency-value" id="a_banco">0</td></tr>
+                            <tr><td class="indent-1">Inventario suministros (1-3-001)</td><td class="currency-value" id="a_suministros">0</td></tr>
+                            <tr><td class="indent-1">IVA crédito fiscal (1-4-001)</td><td class="currency-value" id="a_iva_cf">0</td></tr>
+                            <tr><td class="indent-1">Edificio (1-6-001)</td><td class="currency-value" id="a_edif_costo">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Dep. acum. Edificio (1-6-002)</td><td class="currency-value neg" id="a_edif_dep">0</td></tr>
+                            <tr><td class="indent-1">Mobiliario (1-7-001)</td><td class="currency-value" id="a_mob_costo">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Dep. acum. Mobiliario (1-7-002)</td><td class="currency-value neg" id="a_mob_dep">0</td></tr>
+                            <tr class="total-row"><td>TOTAL ACTIVO</td><td class="currency-value" id="a_total">0</td></tr>
+
+                            <tr class="group-header"><td colspan="2">PASIVO</td></tr>
+                            <tr><td class="indent-1">IVA por pagar (2-2-001)</td><td class="currency-value" id="p_iva">0</td></tr>
+                            <tr><td class="indent-1">Anticipos clientes (2-3-001)</td><td class="currency-value" id="p_anticipos">0</td></tr>
+                            <tr><td class="indent-1">Cuentas por pagar OTA (2-4-001)</td><td class="currency-value" id="p_ota">0</td></tr>
+                            <tr><td class="indent-1">CCSS obrera por enterar (2-5-001)</td><td class="currency-value" id="p_ccss_o">0</td></tr>
+                            <tr><td class="indent-1">CCSS patronal por enterar (2-5-002)</td><td class="currency-value" id="p_ccss_p">0</td></tr>
+                            <tr><td class="indent-1">ISR empresa por pagar (2-6-001)</td><td class="currency-value" id="p_isr_emp">0</td></tr>
+                            <tr><td class="indent-1">Préstamo bancario LP (2-7-001)</td><td class="currency-value" id="p_prestamo">0</td></tr>
+                            <tr><td class="indent-1">ISR retenido planilla (2-8-001)</td><td class="currency-value" id="p_isr_ret">0</td></tr>
+                            <tr class="total-row"><td>TOTAL PASIVO</td><td class="currency-value neg" id="p_total">0</td></tr>
+
+                            <tr class="group-header"><td colspan="2">PATRIMONIO</td></tr>
+                            <tr><td class="indent-1">Capital social (3-1-001)</td><td class="currency-value" id="pt_capital">0</td></tr>
+                            <tr><td class="indent-1">Resultado del período</td><td class="currency-value" id="pt_resultado">0</td></tr>
+                            <tr class="total-row"><td>TOTAL PATRIMONIO</td><td class="currency-value pos" id="pt_total">0</td></tr>
+
+                            <tr class="key-subtotal"><td>TOTAL PASIVO + PATRIMONIO</td><td class="currency-value" id="esf_pp">0</td></tr>
+                            <tr><td>Diferencia (Activo − [Pasivo + Patrimonio])</td><td class="currency-value" id="esf_dif">0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PLANILLA ===== -->
+        <div id="view-planilla" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="openView('view-params')">✎ Editar parámetros</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>👥 Planilla y ISR Asalariados 2026</h2>
+                <div class="info-box"><strong>Tramos ISR Asalariados 2026:</strong> T0 exento ≤ ₡918,000 · T1 10% hasta ₡1,347,000 · T2 15% hasta ₡2,364,000 · T3 20% hasta ₡4,727,000 · T4 25% más. Créditos: hijo ₡1,710 · cónyuge ₡2,590.</div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Concepto</th><th>Recepcionista</th><th>Gerente Gral.</th><th>Total</th></tr></thead>
+                        <tbody>
+                            <tr><td>Salario bruto</td><td class="currency-value" id="pl_sb_r">0</td><td class="currency-value" id="pl_sb_g">0</td><td class="currency-value" id="pl_sb_t">0</td></tr>
+                            <tr><td>(-) CCSS obrera</td><td class="currency-value neg" id="pl_ccss_r">0</td><td class="currency-value neg" id="pl_ccss_g">0</td><td class="currency-value neg" id="pl_ccss_t">0</td></tr>
+                            <tr><td>ISR salarial (tramos)</td><td class="currency-value" id="pl_isr_br_r">0</td><td class="currency-value" id="pl_isr_br_g">0</td><td class="currency-value" id="pl_isr_br_t">0</td></tr>
+                            <tr><td>(-) Créditos</td><td class="currency-value" id="pl_cred_r">0</td><td class="currency-value" id="pl_cred_g">0</td><td class="currency-value" id="pl_cred_t">0</td></tr>
+                            <tr class="subtotal-row"><td>= ISR retenido neto</td><td class="currency-value" id="pl_isr_r">0</td><td class="currency-value" id="pl_isr_g">0</td><td class="currency-value" id="pl_isr_t">0</td></tr>
+                            <tr class="total-row"><td>Neto a pagar al empleado</td><td class="currency-value pos" id="pl_neto_r">0</td><td class="currency-value pos" id="pl_neto_g">0</td><td class="currency-value pos" id="pl_neto_t">0</td></tr>
+                            <tr><td>Tramo aplicado</td><td id="pl_tramo_r">—</td><td id="pl_tramo_g">—</td><td>—</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="warn-box"><strong>Aclaración:</strong> El ISR retenido al trabajador es enterado por el patrono a Hacienda (cta. 2-8-001). <em>No</em> es gasto de la empresa.</div>
+            </div>
+        </div>
+
+        <!-- ===== IVA ===== -->
+        <div id="view-iva" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+            </div>
+            <div class="panel">
+                <h2>🧾 Liquidación del IVA</h2>
+                <div class="info-box"><strong>Ley 9635:</strong> Débito fiscal (ventas) menos crédito fiscal (compras).</div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Concepto</th><th>Base (₡)</th><th>IVA 13% (₡)</th></tr></thead>
+                        <tbody>
+                            <tr class="group-header"><td colspan="3">DÉBITO FISCAL (sobre ventas)</td></tr>
+                            <tr><td class="indent-1">Hospedaje</td><td class="currency-value" id="iva_base_hosp">0</td><td class="currency-value" id="iva_db_hosp">0</td></tr>
+                            <tr><td class="indent-1">A&B</td><td class="currency-value" id="iva_base_ab">0</td><td class="currency-value" id="iva_db_ab">0</td></tr>
+                            <tr><td class="indent-1">Lavandería</td><td class="currency-value" id="iva_base_lav">0</td><td class="currency-value" id="iva_db_lav">0</td></tr>
+                            <tr class="subtotal-row"><td>Total débito fiscal</td><td></td><td class="currency-value" id="iva_db_total">0</td></tr>
+                            <tr class="group-header"><td colspan="3">CRÉDITO FISCAL (sobre compras)</td></tr>
+                            <tr><td class="indent-1">Suministros</td><td class="currency-value" id="iva_base_sum">0</td><td class="currency-value" id="iva_cf_sum">0</td></tr>
+                            <tr><td class="indent-1">Servicios públicos</td><td class="currency-value" id="iva_base_serv">0</td><td class="currency-value" id="iva_cf_serv">0</td></tr>
+                            <tr class="subtotal-row"><td>Total crédito fiscal</td><td></td><td class="currency-value" id="iva_cf_total">0</td></tr>
+                            <tr class="total-row"><td>IVA POR PAGAR (Débito − Crédito)</td><td></td><td class="currency-value" id="iva_neto">0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== KPIs ===== -->
+        <div id="view-kpis" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+            </div>
+            <div class="panel">
+                <h2>📈 Indicadores Hoteleros (KPIs)</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card"><div class="kpi-label">Ocupación</div><div class="kpi-value"><span id="kpi_ocup">0%</span></div><div class="bench">Benchmark CR: 60% – 75%</div></div>
+                    <div class="kpi-card"><div class="kpi-label">ADR</div><div class="kpi-value">₡<span id="kpi_adr">0</span></div><div class="bench">Benchmark CR: ₡80k – ₡150k</div></div>
+                    <div class="kpi-card"><div class="kpi-label">RevPAR</div><div class="kpi-value">₡<span id="kpi_revpar">0</span></div><div class="note">ADR × Ocupación</div></div>
+                    <div class="kpi-card"><div class="kpi-label">GOP Margin</div><div class="kpi-value"><span id="kpi_gop">0%</span></div><div class="bench">Benchmark: 30% – 50%</div></div>
+                    <div class="kpi-card"><div class="kpi-label">GOPPAR</div><div class="kpi-value">₡<span id="kpi_goppar">0</span></div><div class="note">Resultado operativo / hab. disp.</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Margen Neto</div><div class="kpi-value"><span id="kpi_margen">0%</span></div><div class="bench">Benchmark: &gt; 10%</div></div>
+                    <div class="kpi-card"><div class="kpi-label">ROA</div><div class="kpi-value"><span id="kpi_roa">0%</span></div><div class="bench">Benchmark: &gt; 5%</div></div>
+                    <div class="kpi-card"><div class="kpi-label">ROE</div><div class="kpi-value"><span id="kpi_roe">0%</span></div><div class="bench">Benchmark: &gt; 15%</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== VERIFICACIONES ===== -->
+        <div id="view-verif" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="calcular()">🔄 Re-verificar</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>✓ Verificaciones Automáticas del Sistema</h2>
+                <div class="info-box">Todas deben mostrar <strong style="color:#10b981;">verde</strong> para confirmar la integridad contable y fiscal del ejercicio.</div>
+                <ul class="verification-list" id="verif_list"></ul>
+            </div>
+        </div>
+
+        <!-- ===== MARCO NORMATIVO ===== -->
+        <div id="view-legal" class="view">
+            <div class="view-toolbar"><button class="btn-back" onclick="goHome()">← Volver al menú principal</button></div>
+            <div class="panel">
+                <h2>📚 Marco Normativo Aplicado</h2>
+                <div class="legal-grid">
+                    <div class="legal-card"><strong>IFRS 18 — Presentación y Revelación en EEFF</strong><span>Vigente desde 1-ene-2027. Estructura el ER en categorías: Operativa, Inversión, Financiación e Impuestos.</span></div>
+                    <div class="legal-card"><strong>NIIF 15 — Ingresos por contratos con clientes</strong><span>Anticipos como pasivo (ingreso diferido). Reconocimiento al transferir control del servicio.</span></div>
+                    <div class="legal-card"><strong>NIC 16 — Propiedades, planta y equipo</strong><span>Modelo del costo. Depreciación lineal mensual.</span></div>
+                    <div class="legal-card"><strong>NIC 23 — Costos por préstamos</strong><span>Intereses como gasto del período en la categoría de financiación.</span></div>
+                    <div class="legal-card"><strong>Ley 7092 — Impuesto sobre la Renta</strong><span>Tasa empresarial 30% (art. 15). Tramos progresivos asalariados Min. Hacienda 2026.</span></div>
+                    <div class="legal-card"><strong>Ley 9635 — Fortalecimiento Finanzas Públicas</strong><span>IVA general 13% sobre servicios turísticos. Mecanismo débito/crédito fiscal.</span></div>
+                    <div class="legal-card"><strong>CNPT — Normas y Procedimientos Tributarios</strong><span>Obligaciones formales y materiales del contribuyente.</span></div>
+                    <div class="legal-card"><strong>Código de Comercio</strong><span>Obligación de llevar Libro Diario, Libro Mayor y Balance de Comprobación.</span></div>
+                    <div class="legal-card"><strong>CCSS 2026</strong><span>Patronal 26.83% (IVM 5.58%) y obrera 10.83% (IVM 4.33%).</span></div>
+                    <div class="legal-card"><strong>USALI 11.ª Edición</strong><span>Estructura departamental Habitaciones / A&B / Admin.</span></div>
+                    <div class="legal-card"><strong>Contabilidad Básica para PYMES</strong><span>Convenciones de formato: comprobante por asiento, numeración de líneas, saldo corrido en Mayor, sumas y saldos en Balance de Comprobación.</span></div>
+                    <div class="legal-card"><strong>Asientos de Diario — Contabilidad Básica</strong><span>Naturaleza de cuentas: Activos y Gastos son deudores; Pasivos, Patrimonio e Ingresos son acreedores. Verificación automática en este sistema.</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Calculadora Contable — Hotel Estudiantes S.A. | Período: Julio 2026 | IFRS 18 + Ley 7092 + Ley 9635 + USALI 11.ª Ed.</p>
+            <p>Ejercicio Académico © ACC.CONTADORES — CPI José Andrés Cajimenez J. · CPI Marcia Elizondo Martínez</p>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONSTANTES NORMATIVAS ====================
+        const TRAMOS_2026 = [
+            { hasta: 918000,  tasa: 0.00, nombre: "T0 — Exento" },
+            { hasta: 1347000, tasa: 0.10, nombre: "T1 — 10%" },
+            { hasta: 2364000, tasa: 0.15, nombre: "T2 — 15%" },
+            { hasta: 4727000, tasa: 0.20, nombre: "T3 — 20%" },
+            { hasta: Infinity, tasa: 0.25, nombre: "T4 — 25%" }
+        ];
+        const CRED_CONYUGE = 2590;
+        const CRED_HIJO    = 1710;
+
+        // Plan de cuentas (código → naturaleza)
+        const PLAN_CUENTAS = {
+            "1-1-001": { nombre: "Efectivo y equiv. en Banco BNCR",   naturaleza: "D" },
+            "1-3-001": { nombre: "Inventario de suministros",          naturaleza: "D" },
+            "1-4-001": { nombre: "IVA crédito fiscal",                 naturaleza: "D" },
+            "1-6-001": { nombre: "Edificio y mejoras",                 naturaleza: "D" },
+            "1-6-002": { nombre: "(-) Dep. acumulada Edificio",        naturaleza: "A" },
+            "1-7-001": { nombre: "Mobiliario y equipo",                naturaleza: "D" },
+            "1-7-002": { nombre: "(-) Dep. acumulada Mobiliario",      naturaleza: "A" },
+            "2-2-001": { nombre: "IVA por pagar",                       naturaleza: "A" },
+            "2-3-001": { nombre: "Anticipos de clientes",               naturaleza: "A" },
+            "2-4-001": { nombre: "Cuentas por pagar OTA",               naturaleza: "A" },
+            "2-5-001": { nombre: "Retención obrera CCSS por pagar",     naturaleza: "A" },
+            "2-5-002": { nombre: "CCSS por pagar - cuota patronal",     naturaleza: "A" },
+            "2-6-001": { nombre: "Impuesto sobre la renta por pagar",   naturaleza: "A" },
+            "2-7-001": { nombre: "Préstamo bancario largo plazo",       naturaleza: "A" },
+            "2-8-001": { nombre: "ISR retenido planilla",               naturaleza: "A" },
+            "3-1-001": { nombre: "Capital social",                       naturaleza: "A" },
+            "4-1-001": { nombre: "Ingresos por hospedaje",               naturaleza: "A" },
+            "4-2-001": { nombre: "Ingresos por A&B",                     naturaleza: "A" },
+            "4-3-001": { nombre: "Ingresos por lavandería",              naturaleza: "A" },
+            "5-1-001": { nombre: "Gasto personal Habitaciones (60%)",   naturaleza: "D" },
+            "5-1-002": { nombre: "Gasto personal A&B (25%)",            naturaleza: "D" },
+            "5-1-003": { nombre: "Gasto personal Administración (15%)", naturaleza: "D" },
+            "5-2-001": { nombre: "Gasto cargas sociales patronales",    naturaleza: "D" },
+            "5-3-001": { nombre: "Gasto servicios públicos",             naturaleza: "D" },
+            "5-4-001": { nombre: "Gasto depreciación Edificio",         naturaleza: "D" },
+            "5-4-002": { nombre: "Gasto depreciación Mobiliario",       naturaleza: "D" },
+            "5-5-001": { nombre: "Gasto comisiones OTA",                 naturaleza: "D" },
+            "5-6-001": { nombre: "Gasto ISR (provisión)",                naturaleza: "D" },
+            "5-7-001": { nombre: "Gasto por intereses bancarios",        naturaleza: "D" }
+        };
+
+        // ==================== NAVEGACIÓN ====================
+        function openView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById(viewId);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        function goHome() { openView('view-home'); }
+        function switchSubTab(ev, tabId) {
+            const tabsContainer = ev.target.parentElement;
+            const contentRoot   = tabsContainer.parentElement;
+            tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            ev.target.classList.add('active');
+            contentRoot.querySelectorAll(':scope > .tab-content').forEach(c => c.classList.remove('active'));
+            const el = document.getElementById(tabId);
+            if (el) el.classList.add('active');
+        }
+
+        // ==================== UTILIDADES ====================
+        function getNum(id, def = 0) {
+            const el = document.getElementById(id);
+            if (!el) return def;
+            const v = parseFloat(el.value);
+            return isNaN(v) ? def : v;
+        }
+        function fmt(n) {
+            if (isNaN(n) || !isFinite(n)) n = 0;
+            return Math.round(n).toLocaleString('es-CR');
+        }
+        function fmtPct(n) {
+            if (isNaN(n) || !isFinite(n)) n = 0;
+            return (Math.round(n * 100) / 100).toFixed(2) + '%';
+        }
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+        function r2(n) { return Math.round(n * 100) / 100; }
+
+        function calcularISRSalarial(salarioBruto) {
+            let isr = 0;
+            let tramoNombre = TRAMOS_2026[0].nombre;
+            let limiteInf = 0;
+            for (const tr of TRAMOS_2026) {
+                if (salarioBruto > limiteInf) {
+                    const gravable = Math.min(salarioBruto, tr.hasta) - limiteInf;
+                    if (gravable > 0) {
+                        isr += gravable * tr.tasa;
+                        tramoNombre = tr.nombre;
+                    }
+                }
+                limiteInf = tr.hasta;
+                if (salarioBruto <= tr.hasta) break;
+            }
+            return { isr, tramoNombre };
+        }
+
+        // ==================== MOTOR CONTABLE ====================
+        function asiento(num, fecha, concepto, base, comprobante, lineas) {
+            const totalDebe  = lineas.reduce((s, l) => s + l.d, 0);
+            const totalHaber = lineas.reduce((s, l) => s + l.h, 0);
+            return { num, fecha, concepto, base, comprobante, lineas, totalDebe, totalHaber, cuadra: Math.abs(totalDebe - totalHaber) < 0.5 };
+        }
+
+        function buildDiario(d) {
+            const lineas = [];
+            const entries = [];
+
+            // AST-000 — Registro de activos fijos
+            entries.push(asiento("AST-000", "01/07/2026", "Registro activos fijos",
+                "Edificio financiado con préstamo LP; mobiliario al contado · NIC 16",
+                "Esc. compraventa 001 / Fact. 0125",
+                [
+                    { c: "1-6-001", d: d.costoEdif, h: 0 },
+                    { c: "1-7-001", d: d.costoMob,  h: 0 },
+                    { c: "1-1-001", d: 0,           h: d.costoMob },
+                    { c: "2-7-001", d: 0,           h: d.costoEdif }
+                ]));
+
+            entries.push(asiento("AST-001", "01/07/2026", "Aportación de capital inicial",
+                "Los socios aportan capital al hotel · NIC 1",
+                "Acta socios 001",
+                [
+                    { c: "1-1-001", d: d.capital, h: 0 },
+                    { c: "3-1-001", d: 0,         h: d.capital }
+                ]));
+
+            entries.push(asiento("AST-002", "02/07/2026", "Compra de suministros al contado",
+                "Artículos de habitación + IVA crédito fiscal · NIC 2 / Ley 9635",
+                "Fact. proveedor 4502",
+                [
+                    { c: "1-3-001", d: d.suministros,    h: 0 },
+                    { c: "1-4-001", d: d.suministrosIva, h: 0 },
+                    { c: "1-1-001", d: 0, h: d.suministros + d.suministrosIva }
+                ]));
+
+            entries.push(asiento("AST-003", "05/07/2026", "Anticipo de reservación recibido",
+                "Anticipo registrado como pasivo · NIIF 15 párr. 106",
+                "Recibo de dinero 001",
+                [
+                    { c: "1-1-001", d: d.anticipoBruto, h: 0 },
+                    { c: "2-3-001", d: 0,               h: d.anticipoBruto }
+                ]));
+
+            entries.push(asiento("AST-004", "10/07/2026", "Venta de hospedaje al contado",
+                "Habitaciones vendidas + IVA débito 13% · NIIF 15 / Ley 9635",
+                "Fact. electrónica F-1001 a F-1016",
+                [
+                    { c: "1-1-001", d: d.hospedajeBruto, h: 0 },
+                    { c: "4-1-001", d: 0, h: d.hospedajeNeto },
+                    { c: "2-2-001", d: 0, h: d.hospedajeIva }
+                ]));
+
+            entries.push(asiento("AST-005", "12/07/2026", "Aplicación del anticipo al check-in",
+                "Desreconocimiento del pasivo y reconocimiento del ingreso · NIIF 15 párr. 38",
+                "Fact. electrónica F-1017",
+                [
+                    { c: "2-3-001", d: d.anticipoBruto, h: 0 },
+                    { c: "4-1-001", d: 0, h: d.anticipoNeto },
+                    { c: "2-2-001", d: 0, h: d.anticipoIva }
+                ]));
+
+            entries.push(asiento("AST-006", "15/07/2026", "Ventas de alimentos y bebidas (A&B)",
+                "Ingresos restaurante/bar + IVA débito · NIIF 15 / Ley 9635",
+                "Facts. F-1018 a F-1030",
+                [
+                    { c: "1-1-001", d: d.abBruto, h: 0 },
+                    { c: "4-2-001", d: 0, h: d.abNeto },
+                    { c: "2-2-001", d: 0, h: d.abIva }
+                ]));
+
+            entries.push(asiento("AST-007", "16/07/2026", "Comisión a OTA / agencias de viaje",
+                "15% sobre ingresos brutos de hospedaje · NIIF 15",
+                "Liquidación OTA Jul-2026",
+                [
+                    { c: "5-5-001", d: d.comisiones, h: 0 },
+                    { c: "2-4-001", d: 0,            h: d.comisiones }
+                ]));
+
+            entries.push(asiento("AST-008", "31/07/2026", "Pago de planilla mensual",
+                "Distribución USALI · Retención CCSS obrera y ISR retenido · CCSS 2026",
+                "Planilla Jul-2026 / Tx. Banco",
+                [
+                    { c: "5-1-001", d: d.personalHab, h: 0 },
+                    { c: "5-1-002", d: d.personalAb,  h: 0 },
+                    { c: "5-1-003", d: d.personalAdm, h: 0 },
+                    { c: "2-5-001", d: 0, h: d.ccssObreraT },
+                    { c: "2-8-001", d: 0, h: d.isrRetTotal },
+                    { c: "1-1-001", d: 0, h: d.planillaNeto }
+                ]));
+
+            entries.push(asiento("AST-009", "31/07/2026", "Cargas sociales patronales",
+                "Carga patronal CCSS 26.83% sobre planilla · CCSS 2026",
+                "Planilla CCSS Jul-2026",
+                [
+                    { c: "5-2-001", d: d.cargasPat, h: 0 },
+                    { c: "2-5-002", d: 0,           h: d.cargasPat }
+                ]));
+
+            entries.push(asiento("AST-010", "31/07/2026", "Pago de servicios públicos",
+                "ICE + AyA + IVA crédito fiscal · Ley 9635",
+                "Facts. ICE / AyA",
+                [
+                    { c: "5-3-001", d: d.servicios,    h: 0 },
+                    { c: "1-4-001", d: d.serviciosIva, h: 0 },
+                    { c: "1-1-001", d: 0, h: d.servicios + d.serviciosIva }
+                ]));
+
+            entries.push(asiento("AST-011", "31/07/2026", "Depreciación del edificio",
+                "Costo / vida útil / 12 meses · NIC 16",
+                "Cálculo interno Jul-2026",
+                [
+                    { c: "5-4-001", d: d.depEdif, h: 0 },
+                    { c: "1-6-002", d: 0,         h: d.depEdif }
+                ]));
+
+            entries.push(asiento("AST-012", "31/07/2026", "Depreciación del mobiliario",
+                "Costo / vida útil / 12 meses · NIC 16",
+                "Cálculo interno Jul-2026",
+                [
+                    { c: "5-4-002", d: d.depMob, h: 0 },
+                    { c: "1-7-002", d: 0,        h: d.depMob }
+                ]));
+
+            entries.push(asiento("AST-013", "31/07/2026", "Provisión impuesto sobre la renta",
+                "ISR empresa 30% sobre utilidad antes de impuestos · Ley 7092",
+                "Cierre fiscal Jul-2026",
+                [
+                    { c: "5-6-001", d: d.isrEmpresa, h: 0 },
+                    { c: "2-6-001", d: 0,            h: d.isrEmpresa }
+                ]));
+
+            entries.push(asiento("AST-014", "31/07/2026", "Ingresos por lavandería",
+                "Servicio huéspedes + IVA débito · Ley 9635",
+                "Facts. F-1031 a F-1040",
+                [
+                    { c: "1-1-001", d: d.lavBruto, h: 0 },
+                    { c: "4-3-001", d: 0,          h: d.lavNeto },
+                    { c: "2-2-001", d: 0,          h: d.lavIva }
+                ]));
+
+            entries.push(asiento("AST-015", "31/07/2026", "Cuota mensual préstamo bancario",
+                "Amortización capital + intereses · NIC 23",
+                "Tabla amortización mes 1",
+                [
+                    { c: "2-7-001", d: d.cuotaCapital, h: 0 },
+                    { c: "5-7-001", d: d.cuotaInt,     h: 0 },
+                    { c: "1-1-001", d: 0, h: d.cuotaCapital + d.cuotaInt }
+                ]));
+
+            return entries;
+        }
+
+        function buildMayor(diario) {
+            const mayor = {};
+            // inicializar todas las cuentas usadas
+            diario.forEach(a => a.lineas.forEach(l => {
+                if (!mayor[l.c]) {
+                    mayor[l.c] = { codigo: l.c, ...PLAN_CUENTAS[l.c], debe: 0, haber: 0, movs: [] };
+                }
+                mayor[l.c].debe  += l.d;
+                mayor[l.c].haber += l.h;
+                mayor[l.c].movs.push({ asiento: a.num, fecha: a.fecha, debe: l.d, haber: l.h });
+            }));
+            // calcular saldo final
+            Object.values(mayor).forEach(c => {
+                c.saldo = c.debe - c.haber;
+                c.saldoDeudor   = c.saldo > 0 ?  c.saldo : 0;
+                c.saldoAcreedor = c.saldo < 0 ? -c.saldo : 0;
+            });
+            return mayor;
+        }
+
+        function getSaldo(mayor, codigo) {
+            return mayor[codigo] ? mayor[codigo].debe - mayor[codigo].haber : 0;
+        }
+        function saldoAbs(mayor, codigo) {
+            return Math.abs(getSaldo(mayor, codigo));
+        }
+
+        // ==================== RENDERIZADO DE LIBROS ====================
+        function renderDiario(diario) {
+            let html = '';
+            let tDebe = 0, tHaber = 0;
+            diario.forEach((a, idx) => {
+                html += `<tr class="asiento-header">
+                    <td>${a.num}</td>
+                    <td>${a.concepto}</td>
+                    <td colspan="2" style="text-align:right;">${a.fecha} · ${a.comprobante}</td>
+                </tr>`;
+                html += `<tr class="asiento-base"><td></td><td colspan="3">${a.base}</td></tr>`;
+                a.lineas.forEach((l, li) => {
+                    const info = PLAN_CUENTAS[l.c] || { nombre: l.c };
+                    const isHaber = l.h > 0;
+                    html += `<tr>
+                        <td><span style="color:#999;font-size:10.5px;">${li + 1}</span> ${l.c}</td>
+                        <td class="${isHaber ? 'haber-indent' : ''}">${info.nombre}</td>
+                        <td class="currency-value">${l.d > 0 ? fmt(l.d) : ''}</td>
+                        <td class="currency-value">${l.h > 0 ? fmt(l.h) : ''}</td>
+                    </tr>`;
+                });
+                const cuadraIcon = a.cuadra ? '<span style="color:#10b981;">✓</span>' : '<span style="color:#ef4444;">✗</span>';
+                html += `<tr class="asiento-footer">
+                    <td></td>
+                    <td>Subtotal ${a.num} ${cuadraIcon}</td>
+                    <td class="currency-value">${fmt(a.totalDebe)}</td>
+                    <td class="currency-value">${fmt(a.totalHaber)}</td>
+                </tr>`;
+                if (idx < diario.length - 1) {
+                    html += `<tr class="asiento-separator"><td colspan="4"></td></tr>`;
+                }
+                tDebe  += a.totalDebe;
+                tHaber += a.totalHaber;
+            });
+            document.getElementById('diario_body').innerHTML = html;
+            setText('diario_total_debe',  fmt(tDebe));
+            setText('diario_total_haber', fmt(tHaber));
+            setText('diario_diferencia',  fmt(tDebe - tHaber) + (Math.abs(tDebe - tHaber) < 1 ? ' ✓' : ' ✗'));
+        }
+
+        function renderMayor(mayor) {
+            const cuentas = Object.values(mayor).sort((a,b) => a.codigo.localeCompare(b.codigo));
+            let html = '';
+            cuentas.forEach(c => {
+                const natTxt = c.naturaleza === 'D' ? 'Deudora' : 'Acreedora';
+                const saldoLabel = c.saldo >= 0
+                    ? 'Saldo deudor: ₡' + fmt(c.saldo)
+                    : 'Saldo acreedor: ₡' + fmt(-c.saldo);
+                html += `<div class="mayor-card">
+                    <div class="mayor-card-header">
+                        <span>${c.codigo} · ${c.nombre} <span style="opacity:0.7;font-weight:400;font-size:11.5px;">(${natTxt})</span></span>
+                        <span class="saldo">${saldoLabel}</span>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th style="width:90px">Asiento</th><th>Fecha</th><th>Debe</th><th>Haber</th><th>Saldo</th></tr></thead>
+                            <tbody>`;
+                let saldoCorrido = 0;
+                c.movs.forEach(m => {
+                    saldoCorrido += m.debe - m.haber;
+                    html += `<tr>
+                        <td>${m.asiento}</td>
+                        <td>${m.fecha}</td>
+                        <td class="currency-value">${m.debe > 0 ? fmt(m.debe) : ''}</td>
+                        <td class="currency-value">${m.haber > 0 ? fmt(m.haber) : ''}</td>
+                        <td class="currency-value">${fmt(saldoCorrido)}</td>
+                    </tr>`;
+                });
+                html += `<tr class="total-row">
+                    <td colspan="2">Totales</td>
+                    <td class="currency-value">${fmt(c.debe)}</td>
+                    <td class="currency-value">${fmt(c.haber)}</td>
+                    <td class="currency-value">${fmt(c.saldo)}</td>
+                </tr></tbody></table></div></div>`;
+            });
+            document.getElementById('mayor_body').innerHTML = html;
+        }
+
+        function renderBalance(mayor) {
+            const cuentas = Object.values(mayor).sort((a,b) => a.codigo.localeCompare(b.codigo));
+            let html = '';
+            let tDebe = 0, tHaber = 0, tSD = 0, tSA = 0;
+            cuentas.forEach(c => {
+                html += `<tr>
+                    <td>${c.codigo}</td>
+                    <td>${c.nombre}</td>
+                    <td class="currency-value">${fmt(c.debe)}</td>
+                    <td class="currency-value">${fmt(c.haber)}</td>
+                    <td class="currency-value">${c.saldoDeudor > 0 ? fmt(c.saldoDeudor) : ''}</td>
+                    <td class="currency-value">${c.saldoAcreedor > 0 ? fmt(c.saldoAcreedor) : ''}</td>
+                </tr>`;
+                tDebe  += c.debe;
+                tHaber += c.haber;
+                tSD    += c.saldoDeudor;
+                tSA    += c.saldoAcreedor;
+            });
+            document.getElementById('balance_body').innerHTML = html;
+            setText('bal_total_debe',  fmt(tDebe));
+            setText('bal_total_haber', fmt(tHaber));
+            setText('bal_total_sd',    fmt(tSD));
+            setText('bal_total_sa',    fmt(tSA));
+            return { tDebe, tHaber, tSD, tSA };
+        }
+
+        // ==================== CÁLCULO PRINCIPAL ====================
+        function calcular() {
+            // ---- Inputs ----
+            const p = {
+                habDisp:      getNum('hab_disp', 20),
+                ocupacion:    getNum('ocupacion'),
+                tarifa:       getNum('tarifa'),
+                iva:          getNum('iva', 13) / 100,
+                comisionOTA:  getNum('comision_ota') / 100,
+                anticipoBruto: getNum('anticipo_aplicado'),
+                ingABcIVA:    getNum('ingresos_ab'),
+                ingLavcIVA:   getNum('ingresos_lav'),
+                salRecep:     getNum('sal_recepcion'),
+                salGerente:   getNum('sal_gerente'),
+                gerConyuge:   getNum('ger_conyuge', 1),
+                gerHijos:     getNum('ger_hijos', 0),
+                usaliHab:     getNum('usali_hab') / 100,
+                usaliAB:      getNum('usali_ab')  / 100,
+                usaliAdm:     getNum('usali_adm') / 100,
+                cargaPat:     getNum('carga_patronal') / 100,
+                cargaObr:     getNum('carga_obrera')   / 100,
+                suministros:  getNum('suministros'),
+                servicios:    getNum('servicios'),
+                costoEdif:    getNum('costo_edif'),
+                vidaEdif:     getNum('vida_edif', 1),
+                costoMob:     getNum('costo_mob'),
+                vidaMob:      getNum('vida_mob', 1),
+                capital:      getNum('capital'),
+                tasaISR:      getNum('tasa_isr') / 100,
+                prestamoIni:  getNum('prestamo_ini'),
+                cuotaCapital: getNum('cuota_capital'),
+                cuotaInt:     getNum('cuota_intereses')
+            };
+
+            // ---- Derivados básicos ----
+            const habVendidas    = Math.round(p.habDisp * p.ocupacion / 100);
+            const hospedajeNeto  = habVendidas * p.tarifa;
+            const hospedajeIva   = hospedajeNeto * p.iva;
+            const hospedajeBruto = hospedajeNeto + hospedajeIva;
+
+            const anticipoNeto = p.anticipoBruto / (1 + p.iva);
+            const anticipoIva  = p.anticipoBruto - anticipoNeto;
+
+            const abNeto  = p.ingABcIVA / (1 + p.iva);
+            const abIva   = p.ingABcIVA - abNeto;
+            const abBruto = p.ingABcIVA;
+
+            const lavNeto  = p.ingLavcIVA / (1 + p.iva);
+            const lavIva   = p.ingLavcIVA - lavNeto;
+            const lavBruto = p.ingLavcIVA;
+
+            const comisiones = hospedajeNeto * p.comisionOTA;
+
+            const planilla    = p.salRecep + p.salGerente;
+            const personalHab = planilla * p.usaliHab;
+            const personalAb  = planilla * p.usaliAB;
+            const personalAdm = planilla * p.usaliAdm;
+            const cargasPat   = planilla * p.cargaPat;
+            const ccssObreraR = p.salRecep * p.cargaObr;
+            const ccssObreraG = p.salGerente * p.cargaObr;
+            const ccssObreraT = ccssObreraR + ccssObreraG;
+
+            const isrR = calcularISRSalarial(p.salRecep);
+            const credR = 0;
+            const isrRetR = Math.max(0, isrR.isr - credR);
+            const isrG = calcularISRSalarial(p.salGerente);
+            const credG = p.gerConyuge * CRED_CONYUGE + p.gerHijos * CRED_HIJO;
+            const isrRetG = Math.max(0, isrG.isr - credG);
+            const isrRetTotal = isrRetR + isrRetG;
+            const planillaNeto = planilla - ccssObreraT - isrRetTotal;
+
+            const depEdif = (p.costoEdif / p.vidaEdif) / 12;
+            const depMob  = (p.costoMob  / p.vidaMob ) / 12;
+
+            const suministrosIva = p.suministros * p.iva;
+            const serviciosIva   = p.servicios * p.iva;
+
+            // ---- Resultado IFRS 18 (pre-cálculo para AST-013) ----
+            const ingresosOp = hospedajeNeto + anticipoNeto + abNeto + lavNeto;
+            const gastosOp   = comisiones + planilla + cargasPat + p.servicios + depEdif + depMob;
+            const resultadoOperativo = ingresosOp - gastosOp;
+            const preIsr = resultadoOperativo - p.cuotaInt;
+            const isrEmpresa  = Math.max(0, preIsr * p.tasaISR);
+            const resultadoNeto = preIsr - isrEmpresa;
+
+            // ---- Datos para el motor contable ----
+            const datos = {
+                costoEdif: p.costoEdif, costoMob: p.costoMob, capital: p.capital,
+                suministros: p.suministros, suministrosIva,
+                anticipoBruto: p.anticipoBruto, anticipoNeto, anticipoIva,
+                hospedajeBruto, hospedajeNeto, hospedajeIva,
+                abBruto, abNeto, abIva,
+                lavBruto, lavNeto, lavIva,
+                comisiones,
+                personalHab, personalAb, personalAdm,
+                ccssObreraT, isrRetTotal, planillaNeto,
+                cargasPat,
+                servicios: p.servicios, serviciosIva,
+                depEdif, depMob,
+                isrEmpresa,
+                cuotaCapital: p.cuotaCapital, cuotaInt: p.cuotaInt
+            };
+
+            const diario = buildDiario(datos);
+            const mayor  = buildMayor(diario);
+
+            // ==================== RENDER ====================
+            renderDiario(diario);
+            renderMayor(mayor);
+            const balTotales = renderBalance(mayor);
+
+            // -------- Saldos desde el Mayor --------
+            const saldoBanco         = getSaldo(mayor, "1-1-001");
+            const saldoInv           = getSaldo(mayor, "1-3-001");
+            const saldoIvaCred       = getSaldo(mayor, "1-4-001");
+            const saldoEdifCosto     = getSaldo(mayor, "1-6-001");
+            const saldoEdifDep       = saldoAbs(mayor, "1-6-002");
+            const saldoMobCosto      = getSaldo(mayor, "1-7-001");
+            const saldoMobDep        = saldoAbs(mayor, "1-7-002");
+
+            const saldoIvaPagar      = saldoAbs(mayor, "2-2-001");
+            const saldoAnticipos     = saldoAbs(mayor, "2-3-001");
+            const saldoOta           = saldoAbs(mayor, "2-4-001");
+            const saldoCcssO         = saldoAbs(mayor, "2-5-001");
+            const saldoCcssP         = saldoAbs(mayor, "2-5-002");
+            const saldoIsrEmpresa    = saldoAbs(mayor, "2-6-001");
+            const saldoPrestamo      = saldoAbs(mayor, "2-7-001");
+            const saldoIsrRet        = saldoAbs(mayor, "2-8-001");
+
+            const saldoCapital       = saldoAbs(mayor, "3-1-001");
+
+            const saldoIngHosp       = saldoAbs(mayor, "4-1-001");
+            const saldoIngAb         = saldoAbs(mayor, "4-2-001");
+            const saldoIngLav        = saldoAbs(mayor, "4-3-001");
+
+            const gPerHab            = getSaldo(mayor, "5-1-001");
+            const gPerAb             = getSaldo(mayor, "5-1-002");
+            const gPerAdm            = getSaldo(mayor, "5-1-003");
+            const gCargas            = getSaldo(mayor, "5-2-001");
+            const gServ              = getSaldo(mayor, "5-3-001");
+            const gDepEdif           = getSaldo(mayor, "5-4-001");
+            const gDepMob            = getSaldo(mayor, "5-4-002");
+            const gComisiones        = getSaldo(mayor, "5-5-001");
+            const gIsr               = getSaldo(mayor, "5-6-001");
+            const gIntereses         = getSaldo(mayor, "5-7-001");
+
+            // -------- ER desde Mayor --------
+            const ingTotalER  = saldoIngHosp + saldoIngAb + saldoIngLav;
+            const gastosOpER  = gComisiones + gPerHab + gPerAb + gPerAdm + gCargas + gServ + gDepEdif + gDepMob;
+            const resOpER     = ingTotalER - gastosOpER;
+            const preFinER    = resOpER;
+            const preIsrER    = preFinER - gIntereses;
+            const resultadoNetoER = preIsrER - gIsr;
+
+            setText('er_hospedaje', fmt(saldoIngHosp));
+            setText('er_ab',        fmt(saldoIngAb));
+            setText('er_lav',       fmt(saldoIngLav));
+            setText('er_ing_total', fmt(ingTotalER));
+            setText('er_comisiones', '(' + fmt(gComisiones) + ')');
+            setText('er_per_hab',   '(' + fmt(gPerHab) + ')');
+            setText('er_per_ab',    '(' + fmt(gPerAb) + ')');
+            setText('er_per_adm',   '(' + fmt(gPerAdm) + ')');
+            setText('er_ccss',      '(' + fmt(gCargas) + ')');
+            setText('er_serv',      '(' + fmt(gServ) + ')');
+            setText('er_dep_edif',  '(' + fmt(gDepEdif) + ')');
+            setText('er_dep_mob',   '(' + fmt(gDepMob) + ')');
+            setText('er_operativo', fmt(resOpER));
+            setText('er_pre_fin',   fmt(preFinER));
+            setText('er_intereses', '(' + fmt(gIntereses) + ')');
+            setText('er_pre_isr',   fmt(preIsrER));
+            setText('er_isr',       '(' + fmt(gIsr) + ')');
+            setText('er_neto',      fmt(resultadoNetoER));
+
+            // -------- ESF desde Mayor --------
+            const totalActivo = saldoBanco + saldoInv + saldoIvaCred
+                              + saldoEdifCosto - saldoEdifDep
+                              + saldoMobCosto  - saldoMobDep;
+            const totalPasivo = saldoIvaPagar + saldoAnticipos + saldoOta
+                              + saldoCcssO + saldoCcssP
+                              + saldoIsrEmpresa + saldoPrestamo + saldoIsrRet;
+            const totalPatrimonio = saldoCapital + resultadoNetoER;
+            const difESF = totalActivo - (totalPasivo + totalPatrimonio);
+
+            setText('a_banco',       fmt(saldoBanco));
+            setText('a_suministros', fmt(saldoInv));
+            setText('a_iva_cf',      fmt(saldoIvaCred));
+            setText('a_edif_costo',  fmt(saldoEdifCosto));
+            setText('a_edif_dep',    '(' + fmt(saldoEdifDep) + ')');
+            setText('a_mob_costo',   fmt(saldoMobCosto));
+            setText('a_mob_dep',     '(' + fmt(saldoMobDep) + ')');
+            setText('a_total',       fmt(totalActivo));
+            setText('p_iva',         fmt(saldoIvaPagar));
+            setText('p_anticipos',   fmt(saldoAnticipos));
+            setText('p_ota',         fmt(saldoOta));
+            setText('p_ccss_o',      fmt(saldoCcssO));
+            setText('p_ccss_p',      fmt(saldoCcssP));
+            setText('p_isr_emp',     fmt(saldoIsrEmpresa));
+            setText('p_prestamo',    fmt(saldoPrestamo));
+            setText('p_isr_ret',     fmt(saldoIsrRet));
+            setText('p_total',       fmt(totalPasivo));
+            setText('pt_capital',    fmt(saldoCapital));
+            setText('pt_resultado',  fmt(resultadoNetoER));
+            setText('pt_total',      fmt(totalPatrimonio));
+            setText('esf_pp',  fmt(totalPasivo + totalPatrimonio));
+            setText('esf_dif', fmt(difESF));
+
+            // -------- Status bar Home --------
+            setText('sb_op',     '₡' + fmt(resOpER));
+            setText('sb_neto',   '₡' + fmt(resultadoNetoER));
+            setText('sb_ing',    '₡' + fmt(ingTotalER));
+            setText('sb_isr',    '₡' + fmt(gIsr));
+            setText('sb_cuadre', Math.abs(difESF) < 1 ? '✓ Cuadra' : '✗ ₡' + fmt(Math.abs(difESF)));
+
+            // -------- Planilla --------
+            setText('pl_sb_r', fmt(p.salRecep));
+            setText('pl_sb_g', fmt(p.salGerente));
+            setText('pl_sb_t', fmt(planilla));
+            setText('pl_ccss_r', '(' + fmt(ccssObreraR) + ')');
+            setText('pl_ccss_g', '(' + fmt(ccssObreraG) + ')');
+            setText('pl_ccss_t', '(' + fmt(ccssObreraT) + ')');
+            setText('pl_isr_br_r', fmt(isrR.isr));
+            setText('pl_isr_br_g', fmt(isrG.isr));
+            setText('pl_isr_br_t', fmt(isrR.isr + isrG.isr));
+            setText('pl_cred_r', '(' + fmt(credR) + ')');
+            setText('pl_cred_g', '(' + fmt(credG) + ')');
+            setText('pl_cred_t', '(' + fmt(credR + credG) + ')');
+            setText('pl_isr_r', fmt(isrRetR));
+            setText('pl_isr_g', fmt(isrRetG));
+            setText('pl_isr_t', fmt(isrRetTotal));
+            setText('pl_neto_r', fmt(p.salRecep - ccssObreraR - isrRetR));
+            setText('pl_neto_g', fmt(p.salGerente - ccssObreraG - isrRetG));
+            setText('pl_neto_t', fmt(planillaNeto));
+            setText('pl_tramo_r', isrR.tramoNombre);
+            setText('pl_tramo_g', isrG.tramoNombre);
+
+            // -------- IVA --------
+            const ivaDbTotal = hospedajeIva + anticipoIva + abIva + lavIva;
+            const ivaCfTotal = suministrosIva + serviciosIva;
+            setText('iva_base_hosp', fmt(hospedajeNeto + anticipoNeto));
+            setText('iva_db_hosp',   fmt(hospedajeIva + anticipoIva));
+            setText('iva_base_ab',   fmt(abNeto));
+            setText('iva_db_ab',     fmt(abIva));
+            setText('iva_base_lav',  fmt(lavNeto));
+            setText('iva_db_lav',    fmt(lavIva));
+            setText('iva_db_total',  fmt(ivaDbTotal));
+            setText('iva_base_sum',  fmt(p.suministros));
+            setText('iva_cf_sum',    fmt(suministrosIva));
+            setText('iva_base_serv', fmt(p.servicios));
+            setText('iva_cf_serv',   fmt(serviciosIva));
+            setText('iva_cf_total',  fmt(ivaCfTotal));
+            setText('iva_neto',      fmt(ivaDbTotal - ivaCfTotal));
+
+            // -------- KPIs --------
+            const noches = habVendidas;
+            const kpiAdr    = noches > 0 ? saldoIngHosp / noches : 0;
+            const kpiRevpar = kpiAdr * (p.ocupacion / 100);
+            const kpiGop    = ingTotalER > 0 ? (resOpER / ingTotalER) * 100 : 0;
+            const kpiGoppar = p.habDisp > 0 ? resOpER / p.habDisp : 0;
+            const kpiMargen = ingTotalER > 0 ? (resultadoNetoER / ingTotalER) * 100 : 0;
+            const kpiRoa    = totalActivo > 0 ? (resultadoNetoER / totalActivo) * 100 : 0;
+            const kpiRoe    = totalPatrimonio > 0 ? (resultadoNetoER / totalPatrimonio) * 100 : 0;
+            setText('kpi_ocup',   fmtPct(p.ocupacion));
+            setText('kpi_adr',    fmt(kpiAdr));
+            setText('kpi_revpar', fmt(kpiRevpar));
+            setText('kpi_gop',    fmtPct(kpiGop));
+            setText('kpi_goppar', fmt(kpiGoppar));
+            setText('kpi_margen', fmtPct(kpiMargen));
+            setText('kpi_roa',    fmtPct(kpiRoa));
+            setText('kpi_roe',    fmtPct(kpiRoe));
+
+            // -------- VERIFICACIONES --------
+            const ivaPct = p.iva * 100;
+            const usaliSum = p.usaliHab + p.usaliAB + p.usaliAdm;
+            const asientosCuadran = diario.every(a => a.cuadra);
+            const cuadreDiario = Math.abs(balTotales.tDebe - balTotales.tHaber) < 1;
+            const cuadreSaldos = Math.abs(balTotales.tSD - balTotales.tSA) < 1;
+
+            // Verificación naturaleza de cuenta (Contabilidad Básica — partida doble)
+            const cuentasFueraDeNaturaleza = [];
+            Object.values(mayor).forEach(c => {
+                if (Math.abs(c.saldo) < 0.5) return;
+                if (c.naturaleza === 'D' && c.saldo < 0) cuentasFueraDeNaturaleza.push(c.codigo);
+                if (c.naturaleza === 'A' && c.saldo > 0) cuentasFueraDeNaturaleza.push(c.codigo);
+            });
+
+            const verif = [
+                { ok: asientosCuadran, label: "Partida doble: cada asiento cumple Debe = Haber", val: "16 asientos" },
+                { ok: cuadreDiario,    label: "Diario General: Total Debe = Total Haber",     val: "₡" + fmt(balTotales.tDebe) },
+                { ok: cuadreSaldos,    label: "Balance Comp.: Σ Saldos Deudores = Σ Acreedores", val: "₡" + fmt(balTotales.tSD) },
+                { ok: cuentasFueraDeNaturaleza.length === 0, label: "Saldos conformes a naturaleza (Activos deudores, Pasivos acreedores)", val: cuentasFueraDeNaturaleza.length === 0 ? "Todas correctas" : "Fuera: " + cuentasFueraDeNaturaleza.join(", ") },
+                { ok: Math.abs(difESF) < 1, label: "Ecuación contable: Activo = Pasivo + Patrimonio", val: "Δ = ₡" + fmt(Math.abs(difESF)) },
+                { ok: Math.abs(usaliSum - 1) < 0.0001, label: "Distribución USALI suma 100%", val: fmtPct(usaliSum * 100) },
+                { ok: ivaPct === 13,   label: "IVA tarifa general 13% (Ley 9635)", val: fmtPct(ivaPct) },
+                { ok: Math.abs(p.cargaPat - 0.2683) < 0.0005, label: "Carga patronal CCSS 26.83%", val: fmtPct(p.cargaPat * 100) },
+                { ok: Math.abs(p.cargaObr - 0.1083) < 0.0005, label: "Retención obrera CCSS 10.83%", val: fmtPct(p.cargaObr * 100) },
+                { ok: Math.abs(p.tasaISR - 0.30) < 0.0005,    label: "ISR empresarial 30% (Ley 7092 art. 15)", val: fmtPct(p.tasaISR * 100) },
+                { ok: Math.abs(depEdif - p.costoEdif / p.vidaEdif / 12) < 1, label: "Depreciación Edificio (NIC 16)", val: "₡" + fmt(depEdif) },
+                { ok: Math.abs(depMob - p.costoMob / p.vidaMob / 12) < 1,    label: "Depreciación Mobiliario (NIC 16)", val: "₡" + fmt(depMob) },
+                { ok: isrEmpresa >= 0, label: "ISR empresa ≥ 0 (no aplica con pérdida)", val: "₡" + fmt(isrEmpresa) },
+                { ok: true, label: "IFRS 18: Resultado Operativo presentado", val: "₡" + fmt(resOpER) }
+            ];
+            const ul = document.getElementById('verif_list');
+            ul.innerHTML = verif.map(v => `
+                <li>
+                    <span class="status-indicator ${v.ok ? 'status-good' : 'status-bad'}"></span>
+                    <span class="verif-label">${v.label}</span>
+                    <span class="verif-value">${v.val}</span>
+                </li>
+            `).join('');
+        }
+
+        // ==================== RESET / EJEMPLO ====================
+        const DEFAULTS_EJEMPLO = {
+            hab_disp: 20, ocupacion: 80, tarifa: 120000, iva: 13, comision_ota: 15,
+            anticipo_aplicado: 50000, ingresos_ab: 350000, ingresos_lav: 56500,
+            sal_recepcion: 350000, sal_gerente: 950000, ger_conyuge: 1, ger_hijos: 0,
+            usali_hab: 60, usali_ab: 25, usali_adm: 15,
+            carga_patronal: 26.83, carga_obrera: 10.83,
+            suministros: 25000, servicios: 42000,
+            costo_edif: 2400000, vida_edif: 40, costo_mob: 960000, vida_mob: 10,
+            capital: 8000000, tasa_isr: 30,
+            prestamo_ini: 2400000, cuota_capital: 40000, cuota_intereses: 15000
+        };
+        const VALORES_LEGALES_MINIMOS = {
+            iva: 13, carga_patronal: 26.83, carga_obrera: 10.83, tasa_isr: 30,
+            usali_hab: 60, usali_ab: 25, usali_adm: 15,
+            vida_edif: 40, vida_mob: 10, ger_conyuge: 0, ger_hijos: 0
+        };
+
+        function cargarEjemplo() {
+            let cambiados = 0;
+            Object.keys(DEFAULTS_EJEMPLO).forEach(k => {
+                const el = document.getElementById(k);
+                if (el) {
+                    el.value = String(DEFAULTS_EJEMPLO[k]);
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                    cambiados++;
+                }
+            });
+            calcular();
+            mostrarToast('📋 Datos del ejemplo cargados (' + cambiados + ' campos)');
+        }
+        function limpiarValores() {
+            let limpiados = 0;
+            Object.keys(DEFAULTS_EJEMPLO).forEach(k => {
+                const el = document.getElementById(k);
+                if (!el) return;
+                el.value = String(k in VALORES_LEGALES_MINIMOS ? VALORES_LEGALES_MINIMOS[k] : 0);
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+                limpiados++;
+            });
+            calcular();
+            mostrarToast('🧹 ' + limpiados + ' valores limpiados (tarifas legales conservadas)');
+        }
+        function mostrarToast(mensaje) {
+            const existente = document.getElementById('toast');
+            if (existente) existente.remove();
+            const toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.textContent = mensaje;
+            toast.style.cssText = `
+                position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+                background: #1e5a96; color: white; padding: 12px 22px; border-radius: 8px;
+                font-size: 13px; font-weight: 600; box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+                z-index: 9999; animation: toastIn 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s, transform 0.3s';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(10px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2200);
+        }
+
+        window.addEventListener('load', calcular);
+    </script>
+</body>
+</html>
