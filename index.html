@@ -35,6 +35,98 @@
             font-weight: 500;
             letter-spacing: 0.3px;
         }
+        header .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .btn-guia {
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.95);
+            color: #1e5a96;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 700;
+            font-family: inherit;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn-guia:hover {
+            background: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+        }
+
+        /* ===== Guía de uso ===== */
+        .guia-intro {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 24px;
+        }
+        .guia-step {
+            display: flex;
+            gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid #eef1f5;
+        }
+        .guia-step:last-child { border-bottom: none; }
+        .guia-step .num {
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #1e5a96;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .guia-step .body { flex: 1; }
+        .guia-step .body h3 {
+            font-size: 15.5px;
+            color: #1e5a96;
+            margin-bottom: 6px;
+        }
+        .guia-step .body p {
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .guia-step .body ul {
+            margin: 6px 0 0 18px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #555;
+        }
+        .guia-step .body .pill-ref {
+            display: inline-block;
+            background: #eef4fb;
+            color: #1e5a96;
+            padding: 2px 9px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px 3px 2px 0;
+        }
+        .guia-tip {
+            background: #fff8e6;
+            border-left: 4px solid #f59e0b;
+            padding: 14px 18px;
+            border-radius: 6px;
+            margin-top: 22px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #6b4d09;
+        }
 
         .panel {
             background: white;
@@ -239,7 +331,7 @@
             gap: 14px;
         }
 
-        .table-container { overflow-x: auto; margin-bottom: 16px; }
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         thead { background: #f4f6fa; border-bottom: 2px solid #ccc; }
         th {
@@ -377,6 +469,100 @@
         .note { font-size: 10.5px; color: #999; margin-top: 3px; }
         .bench { font-size: 10.5px; color: #777; margin-top: 2px; }
 
+        /* ===== Análisis interpretativo de KPIs ===== */
+        .kpi-analysis { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+        .kpi-explain {
+            border: 1px solid #e5e9ef;
+            border-left: 4px solid #1e5a96;
+            border-radius: 6px;
+            padding: 14px 16px;
+            background: #fcfdff;
+        }
+        .kpi-explain h4 {
+            font-size: 14px;
+            color: #1e5a96;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .kpi-explain h4 .sigla { font-size: 11px; color: #888; font-weight: 600; }
+        .kpi-explain .formula {
+            display: inline-block;
+            background: #eef4fb;
+            color: #1e5a96;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            padding: 3px 9px;
+            border-radius: 5px;
+            margin: 4px 0 8px;
+        }
+        .kpi-explain p { font-size: 13px; line-height: 1.6; color: #555; margin: 0; }
+        .kpi-explain p strong { color: #1e5a96; }
+        .kpi-explain .interp {
+            font-size: 12.5px;
+            line-height: 1.55;
+            color: #555;
+            margin-top: 7px;
+            padding-top: 7px;
+            border-top: 1px dashed #e0e5ec;
+        }
+        .kpi-explain .interp strong { color: #047857; }
+
+        /* ===== Glosario de siglas ===== */
+        .glosario { list-style: none; margin: 4px 0 0; padding: 0; }
+        .glosario li {
+            display: flex;
+            gap: 12px;
+            align-items: baseline;
+            padding: 9px 0;
+            border-bottom: 1px solid #eef1f5;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .glosario li:last-child { border-bottom: none; }
+        .glosario .sig {
+            flex-shrink: 0;
+            min-width: 86px;
+            font-weight: 700;
+            color: #1e5a96;
+        }
+        .glosario .sig-en { color: #555; }
+        .glosario .sig-en em { color: #888; font-style: italic; }
+
+        /* Glosario desplegable (botón) */
+        .glosario-box { margin: 6px 0 16px; }
+        .glosario-box > summary {
+            list-style: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: #1e5a96;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 7px;
+            font-size: 13.5px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 2px 5px rgba(30,90,150,0.2);
+        }
+        .glosario-box > summary::-webkit-details-marker { display: none; }
+        .glosario-box > summary:hover { background: #164378; transform: translateY(-1px); }
+        .glosario-box > summary .chevron { transition: transform 0.2s ease; font-size: 11px; }
+        .glosario-box[open] > summary .chevron { transform: rotate(180deg); }
+        .glosario-box > summary .hint { font-weight: 500; font-size: 11.5px; opacity: 0.85; }
+        .glosario-box[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+        .glosario-box .glosario-content {
+            border: 1px solid #d8e0ea;
+            border-top: none;
+            border-radius: 0 7px 7px 7px;
+            padding: 8px 18px 4px;
+            animation: fadeIn 0.2s ease;
+        }
+
         .currency-value { font-family: 'Monaco', 'Menlo', monospace; text-align: right; }
 
         .info-box {
@@ -449,16 +635,61 @@
             outline-offset: 2px;
         }
 
+        /* ===== RESPONSIVO ===== */
+
+        /* Tablet / pantallas medianas */
+        @media (max-width: 900px) {
+            body { padding: 14px; }
+            header { padding: 22px 20px; }
+            header h1 { font-size: 22px; }
+            .panel { padding: 18px 16px; }
+            .menu-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+            .kpi-grid, .column-group, .legal-grid { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+            .status-bar { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+        }
+
+        /* Móvil */
         @media (max-width: 600px) {
             body { padding: 10px; }
             header { padding: 18px 16px; }
             header h1 { font-size: 19px; }
+            header p { font-size: 12px; }
+            header .header-top { flex-direction: column; }
+            .btn-guia { width: 100%; text-align: center; }
+            .guia-step { gap: 12px; }
             .panel { padding: 16px 13px; }
+            .panel h2 { font-size: 16px; }
             table { font-size: 12px; }
             th, td { padding: 7px 4px; }
+            .menu-grid { grid-template-columns: 1fr; gap: 12px; }
+            .menu-card { min-height: auto; padding: 18px 16px; }
             .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .column-group { grid-template-columns: 1fr; }
+            .legal-grid { grid-template-columns: 1fr; }
+            .status-bar { grid-template-columns: 1fr 1fr; }
+            /* Pestañas deslizables horizontalmente en vez de amontonarse */
+            .tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+            }
+            .tab { flex: 0 0 auto; white-space: nowrap; padding: 10px 12px; }
             .view-toolbar { flex-direction: column; align-items: stretch; }
             .toolbar-right { justify-content: flex-start; }
+            .btn-back, .btn-action { width: 100%; text-align: center; }
+            /* iOS no hace auto-zoom si la fuente del campo es >= 16px */
+            .input-group input, .input-group select, .room-table input { font-size: 16px; }
+            .room-table input { max-width: none; }
+        }
+
+        /* Móvil pequeño */
+        @media (max-width: 400px) {
+            header h1 { font-size: 17px; }
+            .kpi-grid, .status-bar { grid-template-columns: 1fr; }
+            header .badge { font-size: 10px; padding: 2px 8px; }
+            table { font-size: 11px; }
+            th, td { padding: 6px 3px; }
         }
 
         /* Impresión / exportación a PDF: muestra solo la vista activa, sin controles */
@@ -474,14 +705,24 @@
             tr, .mayor-card, .kpi-card, .legal-card { break-inside: avoid; }
             .info-box, .warn-box { border: 1px solid #ccc; }
             a[href]:after { content: ""; }
+            /* Mostrar siempre el glosario al imprimir, aunque esté colapsado en pantalla */
+            .glosario-box .glosario-content { display: block !important; }
+            .glosario-box > summary { background: #fff !important; color: #000 !important; box-shadow: none; padding: 0 0 4px; font-size: 14px; }
+            .glosario-box > summary .hint, .glosario-box > summary .chevron { display: none; }
+            .glosario-box .glosario-content { border: none; padding: 0; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🏨 Calculadora Contable — Hotel Estudiantes S.A.</h1>
-            <p>Contabilidad de Empresas Turísticas | Período: Julio 2026 | Moneda: ₡ (Colones Costarricenses)</p>
+            <div class="header-top">
+                <div>
+                    <h1>🏨 Calculadora Contable — Hotel Estudiantes S.A.</h1>
+                    <p>Contabilidad de Empresas Turísticas | Período: Julio 2026 | Moneda: ₡ (Colones Costarricenses)</p>
+                </div>
+                <button class="btn-guia" onclick="openView('view-guia')">📘 Guía de uso</button>
+            </div>
             <div class="badges">
                 <span class="badge">IFRS 18 (vigente 2027)</span>
                 <span class="badge">NIIF 15 · NIC 2 · NIC 16 · NIC 23</span>
@@ -591,6 +832,137 @@
             </div>
         </div>
 
+        <!-- ===== GUÍA DE USO ===== -->
+        <div id="view-guia" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="openView('view-params')">📋 Ir a Parámetros</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>📘 Guía de uso — Paso a paso</h2>
+                <p class="guia-intro">
+                    Esta calculadora reproduce el ciclo contable completo de un hotel a partir de un
+                    <strong>Libro Diario paramétrico de 16 asientos</strong>. Usted modifica los supuestos del ejercicio
+                    (tarifa, ocupación, planilla, activos, financiación) y la herramienta regenera automáticamente
+                    todos los libros, estados financieros, indicadores y verificaciones bajo IFRS 18 y la normativa
+                    fiscal costarricense. Siga estos pasos:
+                </p>
+
+                <div class="guia-step">
+                    <div class="num">1</div>
+                    <div class="body">
+                        <h3>Abra los Parámetros del Ejercicio</h3>
+                        <p>Desde el menú principal pulse la tarjeta <span class="pill-ref">📋 Parámetros del Ejercicio</span>.
+                           Allí encontrará los supuestos editables organizados en pestañas:</p>
+                        <ul>
+                            <li><strong>Operación:</strong> tarifa por habitación, número de habitaciones, % de ocupación, otros ingresos, IVA.</li>
+                            <li><strong>Personal / CCSS:</strong> salarios, cargas sociales patronales y obreras.</li>
+                            <li><strong>Costos / Activos:</strong> compras, inventarios, propiedad, planta y equipo, depreciación.</li>
+                            <li><strong>Financiamiento:</strong> préstamos, tasas de interés y capital.</li>
+                            <li><strong>Análisis de Costos:</strong> supuestos de costos fijos/variables para el CVP.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guia-step">
+                    <div class="num">2</div>
+                    <div class="body">
+                        <h3>Cargue el ejemplo (opcional, recomendado la primera vez)</h3>
+                        <p>Pulse <span class="pill-ref">📋 Cargar ejemplo</span> para llenar todos los campos con los datos
+                           del caso «Hotel Estudiantes S.A.». Así puede ver la herramienta funcionando antes de
+                           ingresar sus propios valores. Para empezar de cero use <span class="pill-ref">🧹 Limpiar valores</span>.</p>
+                    </div>
+                </div>
+
+                <div class="guia-step">
+                    <div class="num">3</div>
+                    <div class="body">
+                        <h3>Modifique los valores en amarillo</h3>
+                        <p>Los campos con fondo amarillo son los únicos editables. Cambie los que necesite
+                           (por ejemplo la tarifa o el % de ocupación) para analizar distintos escenarios.</p>
+                    </div>
+                </div>
+
+                <div class="guia-step">
+                    <div class="num">4</div>
+                    <div class="body">
+                        <h3>Recalcule</h3>
+                        <p>Pulse <span class="pill-ref">🔄 Recalcular</span>. La herramienta regenera los 16 asientos
+                           y propaga los nuevos importes a todos los reportes. En la parte superior del menú verá
+                           actualizarse los indicadores rápidos: Resultado Operativo, Utilidad Neta, Ingresos, ISR y el cuadre Activo = Pasivo + Patrimonio.</p>
+                    </div>
+                </div>
+
+                <div class="guia-step">
+                    <div class="num">5</div>
+                    <div class="body">
+                        <h3>Recorra los libros contables</h3>
+                        <p>Vuelva al menú y revise, en orden lógico:</p>
+                        <ul>
+                            <li><span class="pill-ref">📖 Libro Diario</span> — los 16 asientos (AST-000 a AST-015).</li>
+                            <li><span class="pill-ref">📚 Libro Mayor</span> — movimientos agrupados por cuenta.</li>
+                            <li><span class="pill-ref">⚖️ Balance de Comprobación</span> — sumas y saldos, verificación Debe = Haber.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guia-step">
+                    <div class="num">6</div>
+                    <div class="body">
+                        <h3>Analice los Estados Financieros</h3>
+                        <ul>
+                            <li><span class="pill-ref">📊 Estado de Resultados</span> — presentación IFRS 18 por categorías (Operativa · Inversión · Financiación · Impuestos).</li>
+                            <li><span class="pill-ref">🏛️ Situación Financiera</span> — con verificación Activo = Pasivo + Patrimonio.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guia-step">
+                    <div class="num">7</div>
+                    <div class="body">
+                        <h3>Consulte los módulos fiscales y de gestión</h3>
+                        <ul>
+                            <li><span class="pill-ref">👥 Planilla / ISR 2026</span> — tramos Min. Hacienda 2026, CCSS y créditos familiares.</li>
+                            <li><span class="pill-ref">🧾 Liquidación IVA</span> — débito menos crédito fiscal (Ley 9635, 13%).</li>
+                            <li><span class="pill-ref">📈 KPIs Hoteleros</span> — ADR, RevPAR, GOPPAR, GOP Margin, ROA, ROE.</li>
+                            <li><span class="pill-ref">🧮 Análisis de Costos (CVP)</span> — margen de contribución, punto de equilibrio, apalancamiento y GOP departamental USALI.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guia-step">
+                    <div class="num">8</div>
+                    <div class="body">
+                        <h3>Verifique cumplimiento e integridad</h3>
+                        <ul>
+                            <li><span class="pill-ref">📐 Cumplimiento NIIF</span> — tablero por norma (NIC 2, 12, 16, 23, 37 · NIIF 15 · IFRS 18) con notas didácticas.</li>
+                            <li><span class="pill-ref">✓ Verificaciones</span> — chequeos automáticos de cuadre y normativa.</li>
+                            <li><span class="pill-ref">📚 Marco Normativo</span> — referencias legales y técnicas aplicadas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="guia-step">
+                    <div class="num">9</div>
+                    <div class="body">
+                        <h3>Imprima o exporte</h3>
+                        <p>En cada reporte puede usar la impresión del navegador (Ctrl+P) para guardar en PDF.
+                           El diseño está optimizado para imprimir solo el contenido del reporte, sin menús ni botones.</p>
+                    </div>
+                </div>
+
+                <div class="guia-tip">
+                    💡 <strong>Consejo didáctico:</strong> trabaje siempre en el orden del ciclo contable
+                    (Parámetros → Diario → Mayor → Balance de Comprobación → Estados Financieros → Análisis).
+                    Cualquier cambio en un parámetro se refleja en todos los módulos tras pulsar
+                    <span class="pill-ref">🔄 Recalcular</span>, lo que permite comparar escenarios de forma inmediata.
+                    Puede volver a esta guía en cualquier momento con el botón <strong>📘 Guía de uso</strong> del encabezado.
+                </div>
+            </div>
+        </div>
+
         <!-- ===== PARÁMETROS ===== -->
         <div id="view-params" class="view">
             <div class="view-toolbar">
@@ -620,28 +992,28 @@
                             <tbody>
                                 <tr>
                                     <td>Sencilla</td>
-                                    <td><input type="number" id="cant_sen" value="10" min="0" onchange="calcular()"></td>
-                                    <td><input type="number" id="tar_sen" value="90000" min="0" onchange="calcular()"></td>
-                                    <td><input type="number" id="ocup_sen" value="80" min="0" max="100" step="0.01" onchange="calcular()"></td>
-                                    <td><input type="number" id="hues_sen" value="1" min="0" step="0.1" onchange="calcular()"></td>
+                                    <td><input type="number" id="cant_sen" value="10" min="0" onchange="calcular()" aria-label="Sencilla — N° de habitaciones"></td>
+                                    <td><input type="number" id="tar_sen" value="90000" min="0" onchange="calcular()" aria-label="Sencilla — Tarifa por noche sin IVA"></td>
+                                    <td><input type="number" id="ocup_sen" value="80" min="0" max="100" step="0.01" onchange="calcular()" aria-label="Sencilla — Ocupación %"></td>
+                                    <td><input type="number" id="hues_sen" value="1" min="0" step="0.1" onchange="calcular()" aria-label="Sencilla — Huéspedes por habitación"></td>
                                     <td class="currency-value" id="rt_hn_sen">0</td>
                                     <td class="currency-value" id="rt_ing_sen">0</td>
                                 </tr>
                                 <tr>
                                     <td>Doble</td>
-                                    <td><input type="number" id="cant_dob" value="8" min="0" onchange="calcular()"></td>
-                                    <td><input type="number" id="tar_dob" value="120000" min="0" onchange="calcular()"></td>
-                                    <td><input type="number" id="ocup_dob" value="80" min="0" max="100" step="0.01" onchange="calcular()"></td>
-                                    <td><input type="number" id="hues_dob" value="2" min="0" step="0.1" onchange="calcular()"></td>
+                                    <td><input type="number" id="cant_dob" value="8" min="0" onchange="calcular()" aria-label="Doble — N° de habitaciones"></td>
+                                    <td><input type="number" id="tar_dob" value="120000" min="0" onchange="calcular()" aria-label="Doble — Tarifa por noche sin IVA"></td>
+                                    <td><input type="number" id="ocup_dob" value="80" min="0" max="100" step="0.01" onchange="calcular()" aria-label="Doble — Ocupación %"></td>
+                                    <td><input type="number" id="hues_dob" value="2" min="0" step="0.1" onchange="calcular()" aria-label="Doble — Huéspedes por habitación"></td>
                                     <td class="currency-value" id="rt_hn_dob">0</td>
                                     <td class="currency-value" id="rt_ing_dob">0</td>
                                 </tr>
                                 <tr>
                                     <td>Suite</td>
-                                    <td><input type="number" id="cant_sui" value="2" min="0" onchange="calcular()"></td>
-                                    <td><input type="number" id="tar_sui" value="200000" min="0" onchange="calcular()"></td>
-                                    <td><input type="number" id="ocup_sui" value="70" min="0" max="100" step="0.01" onchange="calcular()"></td>
-                                    <td><input type="number" id="hues_sui" value="2" min="0" step="0.1" onchange="calcular()"></td>
+                                    <td><input type="number" id="cant_sui" value="2" min="0" onchange="calcular()" aria-label="Suite — N° de habitaciones"></td>
+                                    <td><input type="number" id="tar_sui" value="200000" min="0" onchange="calcular()" aria-label="Suite — Tarifa por noche sin IVA"></td>
+                                    <td><input type="number" id="ocup_sui" value="70" min="0" max="100" step="0.01" onchange="calcular()" aria-label="Suite — Ocupación %"></td>
+                                    <td><input type="number" id="hues_sui" value="2" min="0" step="0.1" onchange="calcular()" aria-label="Suite — Huéspedes por habitación"></td>
                                     <td class="currency-value" id="rt_hn_sui">0</td>
                                     <td class="currency-value" id="rt_ing_sui">0</td>
                                 </tr>
@@ -660,61 +1032,61 @@
                         </table>
                     </div>
                     <div class="column-group" style="margin-top:18px;">
-                        <div class="input-group"><label>IVA servicios turísticos (%)</label><input type="number" id="iva" value="13" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Ley 9635</span></div>
-                        <div class="input-group"><label>Comisión OTA / agencias (%)</label><input type="number" id="comision_ota" value="15" min="0" max="100" step="0.01" onchange="calcular()"></div>
-                        <div class="input-group"><label>% de ventas vía OTA</label><input type="number" id="pct_ota" value="60" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Resto: venta directa</span></div>
-                        <div class="input-group"><label>Consumo A&B por huésped (sin IVA) ₡</label><input type="number" id="check_ab" value="18000" min="0" onchange="calcular()"><span class="ref">Check average</span></div>
-                        <div class="input-group"><label>Gasto lavandería por huésped (sin IVA) ₡</label><input type="number" id="gasto_lav" value="2500" min="0" onchange="calcular()"></div>
-                        <div class="input-group"><label>% de reservas con anticipo</label><input type="number" id="pct_reservas_anticipo" value="30" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">NIIF 15 párr. 106</span></div>
-                        <div class="input-group"><label>% del total pagado por anticipado</label><input type="number" id="pct_anticipo" value="50" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">NIIF 15 párr. 38</span></div>
+                        <div class="input-group"><label for="iva">IVA servicios turísticos (%)</label><input type="number" id="iva" value="13" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Ley 9635</span></div>
+                        <div class="input-group"><label for="comision_ota">Comisión OTA / agencias (%)</label><input type="number" id="comision_ota" value="15" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label for="pct_ota">% de ventas vía OTA</label><input type="number" id="pct_ota" value="60" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Resto: venta directa</span></div>
+                        <div class="input-group"><label for="check_ab">Consumo A&B por huésped (sin IVA) ₡</label><input type="number" id="check_ab" value="18000" min="0" onchange="calcular()"><span class="ref">Check average</span></div>
+                        <div class="input-group"><label for="gasto_lav">Gasto lavandería por huésped (sin IVA) ₡</label><input type="number" id="gasto_lav" value="2500" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label for="pct_reservas_anticipo">% de reservas con anticipo</label><input type="number" id="pct_reservas_anticipo" value="30" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">NIIF 15 párr. 106</span></div>
+                        <div class="input-group"><label for="pct_anticipo">% del total pagado por anticipado</label><input type="number" id="pct_anticipo" value="50" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">NIIF 15 párr. 38</span></div>
                     </div>
                 </div>
 
                 <div id="tab_personal" class="tab-content">
                     <div class="warn-box"><strong>Planilla USALI:</strong> Habitaciones 60%, A&B 25%, Administración 15%. ISR según tramos Min. Hacienda 2026.</div>
                     <div class="column-group">
-                        <div class="input-group"><label>Salario Recepcionista ₡</label><input type="number" id="sal_recepcion" value="350000" min="0" onchange="calcular()"></div>
-                        <div class="input-group"><label>Salario Gerente ₡</label><input type="number" id="sal_gerente" value="950000" min="0" onchange="calcular()"></div>
-                        <div class="input-group"><label>Gerente: ¿cónyuge?</label><select id="ger_conyuge" onchange="calcular()"><option value="1" selected>Sí (₡2,590)</option><option value="0">No</option></select></div>
-                        <div class="input-group"><label>Gerente: # hijos (₡1,710 c/u)</label><input type="number" id="ger_hijos" value="0" min="0" max="10" onchange="calcular()"></div>
-                        <div class="input-group"><label>% USALI Habitaciones</label><input type="number" id="usali_hab" value="60" min="0" max="100" step="0.01" onchange="calcular()"></div>
-                        <div class="input-group"><label>% USALI A&B</label><input type="number" id="usali_ab" value="25" min="0" max="100" step="0.01" onchange="calcular()"></div>
-                        <div class="input-group"><label>% USALI Admin</label><input type="number" id="usali_adm" value="15" min="0" max="100" step="0.01" onchange="calcular()"></div>
-                        <div class="input-group"><label>Carga patronal CCSS (%)</label><input type="number" id="carga_patronal" value="26.83" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Vigente 2026-2028</span></div>
-                        <div class="input-group"><label>Retención obrera CCSS (%)</label><input type="number" id="carga_obrera" value="10.83" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label for="sal_recepcion">Salario Recepcionista ₡</label><input type="number" id="sal_recepcion" value="350000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label for="sal_gerente">Salario Gerente ₡</label><input type="number" id="sal_gerente" value="950000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label for="ger_conyuge">Gerente: ¿cónyuge?</label><select id="ger_conyuge" onchange="calcular()"><option value="1" selected>Sí (₡2,590)</option><option value="0">No</option></select></div>
+                        <div class="input-group"><label for="ger_hijos">Gerente: # hijos (₡1,710 c/u)</label><input type="number" id="ger_hijos" value="0" min="0" max="10" onchange="calcular()"></div>
+                        <div class="input-group"><label for="usali_hab">% USALI Habitaciones</label><input type="number" id="usali_hab" value="60" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label for="usali_ab">% USALI A&B</label><input type="number" id="usali_ab" value="25" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label for="usali_adm">% USALI Admin</label><input type="number" id="usali_adm" value="15" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label for="carga_patronal">Carga patronal CCSS (%)</label><input type="number" id="carga_patronal" value="26.83" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Vigente 2026-2028</span></div>
+                        <div class="input-group"><label for="carga_obrera">Retención obrera CCSS (%)</label><input type="number" id="carga_obrera" value="10.83" min="0" max="100" step="0.01" onchange="calcular()"></div>
                     </div>
                 </div>
 
                 <div id="tab_costos" class="tab-content">
                     <div class="column-group">
-                        <div class="input-group"><label>Suministros (sin IVA) ₡</label><input type="number" id="suministros" value="25000" min="0" onchange="calcular()"><span class="ref">NIC 2</span></div>
-                        <div class="input-group"><label>Servicios Públicos (sin IVA) ₡</label><input type="number" id="servicios" value="42000" min="0" onchange="calcular()"></div>
-                        <div class="input-group"><label>Costo Edificio ₡</label><input type="number" id="costo_edif" value="2400000" min="0" onchange="calcular()"><span class="ref">NIC 16</span></div>
-                        <div class="input-group"><label>Vida útil Edificio (años)</label><input type="number" id="vida_edif" value="40" min="1" onchange="calcular()"></div>
-                        <div class="input-group"><label>Costo Mobiliario ₡</label><input type="number" id="costo_mob" value="960000" min="0" onchange="calcular()"></div>
-                        <div class="input-group"><label>Vida útil Mobiliario (años)</label><input type="number" id="vida_mob" value="10" min="1" onchange="calcular()"></div>
-                        <div class="input-group"><label>Capital Social ₡</label><input type="number" id="capital" value="8000000" min="0" onchange="calcular()"></div>
-                        <div class="input-group"><label>Tasa ISR Empresa (%)</label><input type="number" id="tasa_isr" value="30" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Ley 7092</span></div>
+                        <div class="input-group"><label for="suministros">Suministros (sin IVA) ₡</label><input type="number" id="suministros" value="25000" min="0" onchange="calcular()"><span class="ref">NIC 2</span></div>
+                        <div class="input-group"><label for="servicios">Servicios Públicos (sin IVA) ₡</label><input type="number" id="servicios" value="42000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label for="costo_edif">Costo Edificio ₡</label><input type="number" id="costo_edif" value="2400000" min="0" onchange="calcular()"><span class="ref">NIC 16</span></div>
+                        <div class="input-group"><label for="vida_edif">Vida útil Edificio (años)</label><input type="number" id="vida_edif" value="40" min="1" onchange="calcular()"></div>
+                        <div class="input-group"><label for="costo_mob">Costo Mobiliario ₡</label><input type="number" id="costo_mob" value="960000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label for="vida_mob">Vida útil Mobiliario (años)</label><input type="number" id="vida_mob" value="10" min="1" onchange="calcular()"></div>
+                        <div class="input-group"><label for="capital">Capital Social ₡</label><input type="number" id="capital" value="8000000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label for="tasa_isr">Tasa ISR Empresa (%)</label><input type="number" id="tasa_isr" value="30" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Ley 7092</span></div>
                     </div>
                 </div>
 
                 <div id="tab_fin" class="tab-content">
                     <div class="info-box"><strong>IFRS 18:</strong> Los costos financieros se presentan en la categoría <em>Financiación</em>.</div>
                     <div class="column-group">
-                        <div class="input-group"><label>Préstamo LP — saldo inicial ₡</label><input type="number" id="prestamo_ini" value="2400000" min="0" onchange="calcular()"><span class="ref">NIC 23</span></div>
-                        <div class="input-group"><label>Cuota — capital ₡</label><input type="number" id="cuota_capital" value="40000" min="0" onchange="calcular()"></div>
-                        <div class="input-group"><label>Cuota — intereses ₡</label><input type="number" id="cuota_intereses" value="15000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label for="prestamo_ini">Préstamo LP — saldo inicial ₡</label><input type="number" id="prestamo_ini" value="2400000" min="0" onchange="calcular()"><span class="ref">NIC 23</span></div>
+                        <div class="input-group"><label for="cuota_capital">Cuota — capital ₡</label><input type="number" id="cuota_capital" value="40000" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label for="cuota_intereses">Cuota — intereses ₡</label><input type="number" id="cuota_intereses" value="15000" min="0" onchange="calcular()"></div>
                     </div>
                 </div>
 
                 <div id="tab_cvp" class="tab-content">
                     <div class="info-box"><strong>Parámetros analíticos de gestión (costeo variable):</strong> Estos supuestos alimentan el módulo <em>Análisis de Costos (CVP)</em> y los indicadores de gestión. <strong>No</strong> generan asientos ni alteran los estados financieros — son herramientas de contabilidad de gestión (Arredondo; Contab. de Costos; Contab. Hotelera de Restaurantes y de Gestión).</div>
                     <div class="column-group">
-                        <div class="input-group"><label>% Servicios públicos variable</label><input type="number" id="cvp_serv_var" value="40" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Costo mixto (resto = fijo)</span></div>
-                        <div class="input-group"><label>% Costo de ventas A&B (food cost)</label><input type="number" id="cvp_foodcost" value="32" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Meta sector A&B 28–35%</span></div>
-                        <div class="input-group"><label>% Costo variable Lavandería</label><input type="number" id="cvp_lav_var" value="30" min="0" max="100" step="0.01" onchange="calcular()"></div>
-                        <div class="input-group"><label>Costo amenities/suministros por hab. ocupada ₡</label><input type="number" id="cvp_amenities" value="1500" min="0" step="0.01" onchange="calcular()"><span class="ref">Costo variable de habitaciones</span></div>
-                        <div class="input-group"><label>Utilidad meta mensual (después de imp.) ₡</label><input type="number" id="cvp_util_meta" value="222035" min="0" onchange="calcular()"><span class="ref">Para ventas requeridas</span></div>
+                        <div class="input-group"><label for="cvp_serv_var">% Servicios públicos variable</label><input type="number" id="cvp_serv_var" value="40" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Costo mixto (resto = fijo)</span></div>
+                        <div class="input-group"><label for="cvp_foodcost">% Costo de ventas A&B (food cost)</label><input type="number" id="cvp_foodcost" value="32" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Meta sector A&B 28–35%</span></div>
+                        <div class="input-group"><label for="cvp_lav_var">% Costo variable Lavandería</label><input type="number" id="cvp_lav_var" value="30" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label for="cvp_amenities">Costo amenities/suministros por hab. ocupada ₡</label><input type="number" id="cvp_amenities" value="1500" min="0" step="0.01" onchange="calcular()"><span class="ref">Costo variable de habitaciones</span></div>
+                        <div class="input-group"><label for="cvp_util_meta">Utilidad meta mensual (después de imp.) ₡</label><input type="number" id="cvp_util_meta" value="222035" min="0" onchange="calcular()"><span class="ref">Para ventas requeridas</span></div>
                     </div>
                 </div>
             </div>
@@ -985,6 +1357,90 @@
                     <div class="kpi-card"><div class="kpi-label">ROA</div><div class="kpi-value"><span id="kpi_roa">0%</span></div><div class="bench">Benchmark: &gt; 5%</div></div>
                     <div class="kpi-card"><div class="kpi-label">ROE</div><div class="kpi-value"><span id="kpi_roe">0%</span></div><div class="bench">Benchmark: &gt; 15%</div></div>
                 </div>
+
+                <details class="glosario-box">
+                    <summary>📖 Glosario de siglas <span class="hint">— clic para ver / ocultar</span> <span class="chevron">▼</span></summary>
+                    <div class="glosario-content">
+                <div class="info-box" style="font-size:11.5px;">Significado de cada sigla utilizada en los indicadores hoteleros (término en inglés y su traducción al español).</div>
+                <ul class="glosario">
+                    <li><span class="sig">Ocupación</span><span class="sig-en"><strong>Occupancy Rate</strong> — <em>Tasa de ocupación:</em> porcentaje de habitaciones vendidas respecto a las disponibles.</span></li>
+                    <li><span class="sig">ADR</span><span class="sig-en"><strong>Average Daily Rate</strong> — <em>Tarifa Media Diaria:</em> precio promedio cobrado por habitación vendida.</span></li>
+                    <li><span class="sig">RevPAR</span><span class="sig-en"><strong>Revenue Per Available Room</strong> — <em>Ingreso por Habitación Disponible:</em> ingreso de hospedaje por cada habitación disponible.</span></li>
+                    <li><span class="sig">GOP</span><span class="sig-en"><strong>Gross Operating Profit</strong> — <em>Resultado Operativo Bruto:</em> utilidad de la operación antes de intereses e impuestos.</span></li>
+                    <li><span class="sig">GOP Margin</span><span class="sig-en"><strong>Gross Operating Profit Margin</strong> — <em>Margen Operativo Bruto:</em> el GOP expresado como porcentaje de los ingresos.</span></li>
+                    <li><span class="sig">GOPPAR</span><span class="sig-en"><strong>Gross Operating Profit Per Available Room</strong> — <em>Resultado Operativo Bruto por Habitación Disponible.</em></span></li>
+                    <li><span class="sig">ROA</span><span class="sig-en"><strong>Return On Assets</strong> — <em>Rentabilidad del Activo:</em> utilidad neta sobre los activos totales.</span></li>
+                    <li><span class="sig">ROE</span><span class="sig-en"><strong>Return On Equity</strong> — <em>Rentabilidad del Patrimonio:</em> utilidad neta sobre el capital de los socios.</span></li>
+                </ul>
+                    </div>
+                </details>
+
+                <details class="glosario-box">
+                    <summary>📊 ¿Qué representa cada indicador? <span class="hint">— clic para ver / ocultar</span> <span class="chevron">▼</span></summary>
+                    <div class="glosario-content">
+                <div class="info-box" style="font-size:11.5px;">Interpretación contable y de gestión de cada KPI. La fórmula muestra cómo se calcula; el texto en verde indica cómo leer el resultado para tomar decisiones.</div>
+                <div class="kpi-analysis">
+
+                    <div class="kpi-explain">
+                        <h4>Ocupación <span class="sigla">Occupancy Rate</span></h4>
+                        <div class="formula">Habitaciones-noche vendidas ÷ Habitaciones-noche disponibles × 100</div>
+                        <p>Mide <strong>qué proporción de la capacidad del hotel se utilizó</strong> en el período. Es el indicador de volumen por excelencia: responde «¿cuántas de mis habitaciones logré vender?».</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> una ocupación alta con tarifas bajas no siempre es buena. Conviene leerla junto al ADR: se busca el equilibrio entre llenar el hotel y no malbaratar la tarifa. Benchmark CR: 60% – 75%.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>ADR <span class="sigla">Average Daily Rate · Tarifa media diaria</span></h4>
+                        <div class="formula">Ingreso neto de hospedaje ÷ Habitaciones-noche vendidas</div>
+                        <p>Es el <strong>precio promedio efectivamente cobrado por habitación vendida</strong> (ya descontados los días sin ocupar). Refleja el poder de tarifa y el posicionamiento del hotel.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> un ADR creciente indica capacidad de cobrar más por noche (mejor segmento, temporada alta o menor descuento). Solo considera las habitaciones vendidas, por lo que no se ve afectado por las vacías. Benchmark CR: ₡80k – ₡150k.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>RevPAR <span class="sigla">Revenue Per Available Room</span></h4>
+                        <div class="formula">ADR × Ocupación  (o bien: Ingreso de hospedaje ÷ Habitaciones-noche disponibles)</div>
+                        <p>Ingreso de hospedaje <strong>por cada habitación disponible</strong>, esté ocupada o no. Combina en un solo número la tarifa (ADR) y el volumen (ocupación), por lo que es el mejor indicador del desempeño comercial de hospedaje.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> dos hoteles pueden tener el mismo ADR, pero el de mayor ocupación tendrá mejor RevPAR. Es el indicador clave para comparar el rendimiento del área de habitaciones entre períodos o contra la competencia.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>GOP Margin <span class="sigla">Gross Operating Profit Margin</span></h4>
+                        <div class="formula">Resultado operativo bruto (GOP) ÷ Ingresos totales × 100</div>
+                        <p>Porcentaje de los ingresos que <strong>queda como utilidad operativa</strong> después de los gastos operativos del hotel (antes de intereses, impuestos y partidas no operativas). Mide la eficiencia de la gestión.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> a mayor margen, mejor control de costos operativos. Es independiente de cómo se financie el hotel, así que aísla la calidad de la operación. Benchmark sectorial: 30% – 50%.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>GOPPAR <span class="sigla">Gross Operating Profit Per Available Room</span></h4>
+                        <div class="formula">Resultado operativo bruto (GOP) ÷ Habitaciones-noche disponibles</div>
+                        <p>Utilidad operativa <strong>generada por cada habitación disponible</strong>. A diferencia del RevPAR (que mira solo ingresos), el GOPPAR incorpora también los costos, mostrando cuánta ganancia —no solo venta— produce cada habitación.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> es el indicador más completo de rentabilidad operativa hotelera. Un RevPAR alto con GOPPAR bajo revela que se vende mucho pero se gasta demasiado en operar.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>Margen Neto <span class="sigla">Net Profit Margin</span></h4>
+                        <div class="formula">Utilidad neta (después de impuestos) ÷ Ingresos totales × 100</div>
+                        <p>Porcentaje de cada colón de ingreso que <strong>se convierte en utilidad final</strong>, ya descontados todos los gastos: operativos, financieros (intereses) e impuesto sobre la renta.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> es el resultado «de fondo» del negocio. Si el GOP Margin es bueno pero el margen neto es bajo, el peso suele estar en los intereses de deuda o en la carga tributaria. Benchmark: &gt; 10%.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>ROA <span class="sigla">Return On Assets · Rentabilidad del activo</span></h4>
+                        <div class="formula">Utilidad neta ÷ Activos totales × 100</div>
+                        <p>Mide <strong>cuánta utilidad genera el hotel por cada colón invertido en activos</strong> (edificio, mobiliario, equipo, inventarios, efectivo). Evalúa la eficiencia con que se usan los recursos, sin importar si son propios o financiados.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> en hotelería suele ser moderado porque la inversión en activos fijos es muy alta. Un ROA creciente indica que se está «exprimiendo» mejor la infraestructura. Benchmark: &gt; 5%.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>ROE <span class="sigla">Return On Equity · Rentabilidad del patrimonio</span></h4>
+                        <div class="formula">Utilidad neta ÷ Patrimonio × 100</div>
+                        <p>Rendimiento que obtienen los <strong>dueños o socios sobre el capital que aportaron</strong>. Es el indicador que más le interesa al inversionista: cuánto gana por su dinero propio puesto en el hotel.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> normalmente es mayor que el ROA gracias al apalancamiento (uso de deuda). Si ROE es muy superior al ROA, el hotel está financiándose fuertemente con deuda, lo que aumenta el rendimiento pero también el riesgo. Benchmark: &gt; 15%.</p>
+                    </div>
+
+                </div>
+                    </div>
+                </details>
+
                 <h2 style="font-size:15px;margin-top:6px;">Desglose por tipo de habitación</h2>
                 <div class="info-box" style="font-size:11.5px;">ADR e ingresos por tipo (Sencilla / Doble / Suite) y su participación en el ingreso de hospedaje (mix). Fuente: tabla de la pestaña Operación.</div>
                 <div class="table-container">
@@ -1025,6 +1481,32 @@
                 <div class="info-box">
                     <strong>Contabilidad de gestión.</strong> Reclasifica los costos operativos del Estado de Resultados en <strong>fijos</strong> y <strong>variables</strong> (costeo variable) para calcular el <em>margen de contribución</em>, el <em>punto de equilibrio</em> y el <em>apalancamiento operativo</em>. Fuentes: <em>Contabilidad y Análisis de Costos</em> (M. Arredondo), <em>Contabilidad de Costos</em>, <em>Contabilidad Fundamentos y Usos</em>, y <em>Contabilidad Hotelera, de Restaurantes y de Gestión</em>. El resultado operativo del CVP reconcilia con el del Estado de Resultados (IFRS 18).
                 </div>
+
+                <details class="glosario-box">
+                    <summary>📖 Glosario de siglas y términos <span class="hint">— clic para ver / ocultar</span> <span class="chevron">▼</span></summary>
+                    <div class="glosario-content">
+                <div class="info-box" style="font-size:11.5px;">Significado de las siglas y abreviaturas empleadas en el análisis Costo-Volumen-Utilidad y en la estructura departamental USALI.</div>
+                <ul class="glosario">
+                    <li><span class="sig">CVP</span><span class="sig-en"><strong>Costo-Volumen-Utilidad</strong> (<em>Cost-Volume-Profit</em>) — modelo que relaciona costos, volumen de ventas y utilidad.</span></li>
+                    <li><span class="sig">CF</span><span class="sig-en"><strong>Costos Fijos</strong> — no varían con el nivel de ocupación (depreciación, salarios base, alquiler).</span></li>
+                    <li><span class="sig">CV</span><span class="sig-en"><strong>Costos Variables</strong> — cambian en proporción al volumen vendido (comisiones OTA, amenities, food cost).</span></li>
+                    <li><span class="sig">MC</span><span class="sig-en"><strong>Margen de Contribución</strong> (<em>Contribution Margin</em>) — Ventas − Costos Variables; lo que «contribuye» a cubrir costos fijos y generar utilidad.</span></li>
+                    <li><span class="sig">RMC</span><span class="sig-en"><strong>Razón de Margen de Contribución</strong> (<em>Contribution Margin Ratio</em>) — MC ÷ Ventas, expresado en porcentaje.</span></li>
+                    <li><span class="sig">PE</span><span class="sig-en"><strong>Punto de Equilibrio</strong> (<em>Break-Even Point, BEP</em>) — nivel de ventas en el que no hay pérdida ni ganancia (CF ÷ RMC).</span></li>
+                    <li><span class="sig">GAO</span><span class="sig-en"><strong>Grado de Apalancamiento Operativo</strong> (<em>Degree of Operating Leverage, DOL</em>) — MC ÷ Resultado operativo; sensibilidad de la utilidad ante cambios en ventas.</span></li>
+                    <li><span class="sig">RCV</span><span class="sig-en"><strong>Razón de Costo Variable</strong> — CV ÷ Ventas, en porcentaje.</span></li>
+                    <li><span class="sig">RCF</span><span class="sig-en"><strong>Razón de Costo Fijo</strong> — CF ÷ Ventas, en porcentaje.</span></li>
+                    <li><span class="sig">GOP</span><span class="sig-en"><strong>Gross Operating Profit</strong> — <em>Resultado Operativo Bruto:</em> utilidad departamental menos gastos no distribuidos.</span></li>
+                    <li><span class="sig">GOPPAR</span><span class="sig-en"><strong>Gross Operating Profit Per Available Room</strong> — <em>Resultado Operativo Bruto por Habitación Disponible.</em></span></li>
+                    <li><span class="sig">USALI</span><span class="sig-en"><strong>Uniform System of Accounts for the Lodging Industry</strong> — sistema uniforme de cuentas para la industria del hospedaje (estructura departamental estándar).</span></li>
+                    <li><span class="sig">ADR</span><span class="sig-en"><strong>Average Daily Rate</strong> — <em>Tarifa Media Diaria</em> por habitación vendida.</span></li>
+                    <li><span class="sig">A&amp;B</span><span class="sig-en"><strong>Alimentos y Bebidas</strong> (<em>Food &amp; Beverage, F&amp;B</em>) — departamento de restaurante, bar y banquetes.</span></li>
+                    <li><span class="sig">Food cost</span><span class="sig-en"><strong>Costo de los alimentos</strong> — costo de la materia prima de A&amp;B como % de sus ventas.</span></li>
+                    <li><span class="sig">OTA</span><span class="sig-en"><strong>Online Travel Agency</strong> — agencia de viajes en línea (Booking, Expedia…) que cobra comisión por reserva.</span></li>
+                    <li><span class="sig">pp</span><span class="sig-en"><strong>Puntos porcentuales</strong> — diferencia aritmética entre dos porcentajes (p. ej. 70% − 55% = 15 pp).</span></li>
+                </ul>
+                    </div>
+                </details>
 
                 <h2 style="font-size:15px;margin-top:6px;">1 · Clasificación de costos operativos</h2>
                 <div class="table-container">
@@ -1077,6 +1559,100 @@
                         <tbody id="gop_body"></tbody>
                     </table>
                 </div>
+
+                <details class="glosario-box">
+                    <summary>📊 6 · ¿Qué representa cada indicador de costos? <span class="hint">— clic para ver / ocultar</span> <span class="chevron">▼</span></summary>
+                    <div class="glosario-content">
+                <div class="info-box" style="font-size:11.5px;">Interpretación de gestión de cada métrica del análisis Costo-Volumen-Utilidad. La fórmula muestra el cálculo; el texto en verde explica cómo leer el resultado para tomar decisiones.</div>
+                <div class="kpi-analysis">
+
+                    <div class="kpi-explain">
+                        <h4>Margen de Contribución <span class="sigla">MC · Contribution Margin</span></h4>
+                        <div class="formula">Ventas operativas − Costos variables</div>
+                        <p>Es el dinero que <strong>queda de las ventas después de pagar los costos variables</strong> y que «contribuye» a cubrir los costos fijos y, una vez cubiertos, a generar utilidad.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> mientras el MC no cubra los costos fijos, el hotel opera con pérdida. Cada colón vendido por encima del punto de equilibrio aporta su MC directamente a la utilidad.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>Razón de Margen de Contribución <span class="sigla">RMC · Contribution Margin Ratio</span></h4>
+                        <div class="formula">Margen de contribución ÷ Ventas × 100</div>
+                        <p>Expresa el MC como <strong>porcentaje de las ventas</strong>: de cada ₡100 de ingreso, cuántos quedan para cubrir costos fijos y utilidad.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> a mayor RMC, más «rinde» cada venta. En hotelería suele ser alta porque el costo variable por habitación es bajo (la mayoría de costos son fijos). Es la base para calcular el punto de equilibrio.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>Punto de Equilibrio <span class="sigla">PE · Break-Even Point</span></h4>
+                        <div class="formula">Costos fijos ÷ RMC</div>
+                        <p>Nivel de ventas en el que el hotel <strong>no gana ni pierde</strong>: el margen de contribución iguala exactamente los costos fijos. Por debajo hay pérdida; por encima, utilidad.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> es la meta mínima de ventas del período. Cuanto más alto el PE, más vulnerable es el hotel a caídas de ocupación. Bajar costos fijos o subir la RMC reduce el PE.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>Margen de Seguridad <span class="sigla">Margin of Safety</span></h4>
+                        <div class="formula">(Ventas reales − Ventas de equilibrio) ÷ Ventas reales × 100</div>
+                        <p>Indica <strong>cuánto pueden caer las ventas antes de entrar en pérdida</strong>. Es el «colchón» entre las ventas actuales y el punto de equilibrio.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> un margen de seguridad amplio significa menor riesgo operativo. Si es bajo, una pequeña baja de ocupación lleva al hotel a pérdidas.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>Grado de Apalancamiento Operativo <span class="sigla">GAO · Degree of Operating Leverage</span></h4>
+                        <div class="formula">Margen de contribución ÷ Resultado operativo</div>
+                        <p>Mide <strong>cuánto se amplifica la utilidad operativa ante un cambio en las ventas</strong>. Un GAO de 3× significa que si las ventas suben 10%, la utilidad operativa sube 30%.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> es alto cuando predominan los costos fijos (caso típico del hotel). Multiplica las ganancias en expansión, pero también las pérdidas en recesión: a mayor GAO, mayor riesgo operativo.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>Ventas para utilidad meta <span class="sigla">Target Profit Sales</span></h4>
+                        <div class="formula">(Costos fijos + Utilidad meta antes de impuestos) ÷ RMC</div>
+                        <p>Nivel de ventas necesario para <strong>alcanzar una utilidad objetivo</strong> definida por la gerencia, no solo para no perder.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> es una herramienta de planificación. Permite fijar metas de ocupación y tarifa para lograr la ganancia deseada por los socios.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>MC por noche-habitación <span class="sigla">Unit Contribution Margin</span></h4>
+                        <div class="formula">ADR neto por noche − Costo variable por noche</div>
+                        <p>Es el margen de contribución <strong>de una sola habitación vendida</strong> (tarifa menos comisión OTA y amenities). Lleva el análisis del total del hotel al nivel de cada venta.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> dividiendo los costos fijos entre esta cifra se obtiene cuántas noches-habitación hay que vender para equilibrar. Útil para decidir hasta dónde se puede descontar una tarifa.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>% Ocupación de equilibrio <span class="sigla">Break-Even Occupancy</span></h4>
+                        <div class="formula">Noches-habitación de equilibrio ÷ Habitaciones-noche disponibles × 100</div>
+                        <p>Traduce el punto de equilibrio a <strong>porcentaje de ocupación mínimo</strong> que el hotel debe lograr para no perder.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> se compara con la ocupación real. Si la ocupación de equilibrio es 55% y el hotel opera al 70%, hay 15 pp de holgura. Es uno de los indicadores más prácticos para la gerencia hotelera.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>Costo operativo por habitación ocupada <span class="sigla">Cost Per Occupied Room (CPOR)</span></h4>
+                        <div class="formula">Gastos operativos ÷ Noches-habitación vendidas</div>
+                        <p>Cuánto <strong>cuesta operar cada habitación efectivamente vendida</strong>. Se compara contra el ADR para saber si la tarifa cubre el costo de servir esa habitación.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> si el CPOR se acerca al ADR, el margen por habitación es delgado. Sirve para controlar la eficiencia operativa y fijar tarifas mínimas.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>Food cost % (A&amp;B) <span class="sigla">Food Cost Ratio</span></h4>
+                        <div class="formula">Costo de alimentos y bebidas ÷ Ventas de A&amp;B × 100</div>
+                        <p>Porcentaje de las ventas de restaurante/bar que <strong>se consume en materia prima</strong> (insumos de cocina y bar). Es el indicador de control de costos más usado en A&amp;B.</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> un food cost alto reduce el margen del departamento. Meta sectorial: 28% – 35%. Por encima indica fugas: desperdicio, mermas, precios de compra altos o porciones excesivas.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>Razón de Costo Variable y Razón de Costo Fijo <span class="sigla">RCV · RCF</span></h4>
+                        <div class="formula">RCV = Costos variables ÷ Ventas × 100  ·  RCF = Costos fijos ÷ Ventas × 100</div>
+                        <p>Muestran la <strong>estructura de costos del hotel</strong>: qué proporción de las ventas se va en costos variables y qué proporción en fijos. La RCV es el complemento de la RMC (RCV + RMC = 100%).</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> una RCF alta confirma que el hotel es intensivo en costos fijos (alto GAO, alto riesgo pero alto potencial). Ayuda a entender por qué la rentabilidad depende tanto del volumen de ocupación.</p>
+                    </div>
+
+                    <div class="kpi-explain">
+                        <h4>GOP departamental (USALI) <span class="sigla">Gross Operating Profit</span></h4>
+                        <div class="formula">Σ Utilidades departamentales − Gastos no distribuidos</div>
+                        <p>Resultado de la operación según la estructura <strong>USALI</strong>: suma las utilidades de cada departamento (Habitaciones, A&amp;B…) y resta los gastos no distribuidos (administración, marketing, mantenimiento, energía).</p>
+                        <p class="interp">📊 <strong>Cómo se interpreta:</strong> es la base del GOPPAR y del GOP Margin. Permite ver qué departamento aporta más utilidad y dónde se concentran los gastos generales, antes de cargos fijos a la propiedad (depreciación) e intereses.</p>
+                    </div>
+
+                </div>
+                    </div>
+                </details>
             </div>
         </div>
 
@@ -2095,7 +2671,7 @@
             costo_edif: 2400000, vida_edif: 40, costo_mob: 960000, vida_mob: 10,
             capital: 8000000, tasa_isr: 30,
             prestamo_ini: 2400000, cuota_capital: 40000, cuota_intereses: 15000,
-            cvp_serv_var: 40, cvp_foodcost: 32, cvp_lav_var: 30, cvp_amenities: 1500, cvp_util_meta: 0
+            cvp_serv_var: 40, cvp_foodcost: 32, cvp_lav_var: 30, cvp_amenities: 1500, cvp_util_meta: 222035
         };
         // "Limpiar valores" pone en 0 TODOS los campos EXCEPTO estas tasas legales/normativas,
         // que se conservan para no tener que reescribirlas (IVA, CCSS patronal/obrera, ISR empresa).
