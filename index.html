@@ -170,15 +170,24 @@
         .btn-action.secondary { background: #e5e7eb; color: #333; }
         .btn-action.secondary:hover { background: #d1d5db; }
 
-        .input-group { margin-bottom: 16px; }
+        .input-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+        }
         .input-group label {
-            display: block;
             font-size: 12px;
             font-weight: 600;
             margin-bottom: 6px;
             color: #555;
             text-transform: uppercase;
             letter-spacing: 0.4px;
+            line-height: 1.3;
+            /* Reserva 2 líneas para que los inputs queden alineados aunque
+               las etiquetas tengan distinta longitud (alineación de la cuadrícula). */
+            min-height: 32px;
+            display: flex;
+            align-items: flex-end;
         }
         .input-group input, .input-group select {
             width: 100%;
@@ -246,6 +255,21 @@
         td { padding: 9px 8px; border-bottom: 1px solid #f0f0f0; text-align: right; color: #555; }
         td:first-child { text-align: left; font-weight: 500; color: #333; }
         tbody tr:hover { background: #f9f9f9; }
+
+        /* Tabla editable de tipos de habitación */
+        .room-table th, .room-table td { text-align: center; }
+        .room-table th:first-child, .room-table td:first-child { text-align: left; font-weight: 600; color: #333; }
+        .room-table input {
+            width: 100%;
+            max-width: 140px;
+            padding: 7px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            background-color: #fffef0;
+            text-align: right;
+        }
+        .room-table input:focus { outline: none; border-color: #1e5a96; box-shadow: 0 0 0 3px rgba(30,90,150,0.1); }
 
         .group-header td {
             background: #eef3f9;
@@ -418,10 +442,38 @@
 
         .footer { text-align: center; font-size: 11px; color: #999; margin-top: 24px; line-height: 1.65; }
 
+        /* Accesibilidad: foco visible en controles interactivos */
+        .menu-card:focus-visible, .btn-action:focus-visible, .btn-back:focus-visible,
+        .tab:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 3px solid #f59e0b;
+            outline-offset: 2px;
+        }
+
         @media (max-width: 600px) {
+            body { padding: 10px; }
+            header { padding: 18px 16px; }
             header h1 { font-size: 19px; }
+            .panel { padding: 16px 13px; }
             table { font-size: 12px; }
             th, td { padding: 7px 4px; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .view-toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-right { justify-content: flex-start; }
+        }
+
+        /* Impresión / exportación a PDF: muestra solo la vista activa, sin controles */
+        @media print {
+            body { background: #fff; padding: 0; color: #000; }
+            header { box-shadow: none; border-radius: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            header .badges { display: none; }
+            .view-toolbar, .status-bar, .menu-grid, .tabs, .btn-print { display: none !important; }
+            .view:not(.active) { display: none !important; }
+            .panel { box-shadow: none; padding: 0; }
+            .table-container { overflow: visible; }
+            table { font-size: 10.5px; }
+            tr, .mayor-card, .kpi-card, .legal-card { break-inside: avoid; }
+            .info-box, .warn-box { border: 1px solid #ccc; }
+            a[href]:after { content: ""; }
         }
     </style>
 </head>
@@ -432,12 +484,14 @@
             <p>Contabilidad de Empresas Turísticas | Período: Julio 2026 | Moneda: ₡ (Colones Costarricenses)</p>
             <div class="badges">
                 <span class="badge">IFRS 18 (vigente 2027)</span>
-                <span class="badge">NIIF 15 · NIC 16 · NIC 23</span>
+                <span class="badge">NIIF 15 · NIC 2 · NIC 16 · NIC 23</span>
+                <span class="badge">NIC 12 · NIC 37 (notas)</span>
                 <span class="badge">Ley 7092 — ISR</span>
                 <span class="badge">Ley 9635 — IVA 13%</span>
                 <span class="badge">CNPT · RCNPT</span>
                 <span class="badge">CCSS 2026</span>
                 <span class="badge">USALI 11.ª Ed.</span>
+                <span class="badge">Análisis de Costos · CVP</span>
             </div>
         </header>
 
@@ -510,6 +564,18 @@
                     <span class="desc">ADR · RevPAR · GOPPAR · GOP Margin · ROA · ROE.</span>
                     <span class="arrow">→</span>
                 </button>
+                <button class="menu-card amber" onclick="openView('view-costos')">
+                    <span class="icon">🧮</span>
+                    <span class="title">Análisis de Costos (CVP)</span>
+                    <span class="desc">Costos fijos/variables · Margen de contribución · Punto de equilibrio · Apalancamiento · GOP departamental USALI.</span>
+                    <span class="arrow">→</span>
+                </button>
+                <button class="menu-card teal" onclick="openView('view-niif')">
+                    <span class="icon">📐</span>
+                    <span class="title">Cumplimiento NIIF</span>
+                    <span class="desc">Tablero de cumplimiento por norma (NIC 2, 12, 16, 23, 37 · NIIF 15 · IFRS 18) y notas didácticas.</span>
+                    <span class="arrow">→</span>
+                </button>
                 <button class="menu-card red" onclick="openView('view-verif')">
                     <span class="icon">✓</span>
                     <span class="title">Verificaciones</span>
@@ -543,18 +609,64 @@
                     <button class="tab" onclick="switchSubTab(event,'tab_personal')">Personal / CCSS</button>
                     <button class="tab" onclick="switchSubTab(event,'tab_costos')">Costos / Activos</button>
                     <button class="tab" onclick="switchSubTab(event,'tab_fin')">Financiamiento</button>
+                    <button class="tab" onclick="switchSubTab(event,'tab_cvp')">Análisis de Costos</button>
                 </div>
 
                 <div id="tab_oper" class="tab-content active">
-                    <div class="column-group">
-                        <div class="input-group"><label>Habitaciones disponibles</label><input type="number" id="hab_disp" value="20" min="1" onchange="calcular()"><span class="ref">Hotel boutique 3★</span></div>
-                        <div class="input-group"><label>Ocupación mensual (%)</label><input type="number" id="ocupacion" value="80" min="0" max="100" onchange="calcular()"><span class="ref">Temporada alta julio</span></div>
-                        <div class="input-group"><label>Tarifa por noche (sin IVA) ₡</label><input type="number" id="tarifa" value="120000" min="0" onchange="calcular()"></div>
+                    <div class="info-box"><strong>Modelo dirigido por habitaciones y huéspedes.</strong> Defina los tipos de habitación con su tarifa y ocupación; de ahí se derivan las habitaciones-noche, los huéspedes y —a partir de estos— los ingresos de A&B, lavandería y la comisión OTA.</div>
+                    <div class="table-container">
+                        <table class="room-table">
+                            <thead><tr><th>Tipo de habitación</th><th>N° hab.</th><th>Tarifa/noche sin IVA ₡</th><th>Ocupación %</th><th>Huésp./hab.</th><th>Hab-noche</th><th>Ingreso neto ₡</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td>Sencilla</td>
+                                    <td><input type="number" id="cant_sen" value="10" min="0" onchange="calcular()"></td>
+                                    <td><input type="number" id="tar_sen" value="90000" min="0" onchange="calcular()"></td>
+                                    <td><input type="number" id="ocup_sen" value="80" min="0" max="100" step="0.01" onchange="calcular()"></td>
+                                    <td><input type="number" id="hues_sen" value="1" min="0" step="0.1" onchange="calcular()"></td>
+                                    <td class="currency-value" id="rt_hn_sen">0</td>
+                                    <td class="currency-value" id="rt_ing_sen">0</td>
+                                </tr>
+                                <tr>
+                                    <td>Doble</td>
+                                    <td><input type="number" id="cant_dob" value="8" min="0" onchange="calcular()"></td>
+                                    <td><input type="number" id="tar_dob" value="120000" min="0" onchange="calcular()"></td>
+                                    <td><input type="number" id="ocup_dob" value="80" min="0" max="100" step="0.01" onchange="calcular()"></td>
+                                    <td><input type="number" id="hues_dob" value="2" min="0" step="0.1" onchange="calcular()"></td>
+                                    <td class="currency-value" id="rt_hn_dob">0</td>
+                                    <td class="currency-value" id="rt_ing_dob">0</td>
+                                </tr>
+                                <tr>
+                                    <td>Suite</td>
+                                    <td><input type="number" id="cant_sui" value="2" min="0" onchange="calcular()"></td>
+                                    <td><input type="number" id="tar_sui" value="200000" min="0" onchange="calcular()"></td>
+                                    <td><input type="number" id="ocup_sui" value="70" min="0" max="100" step="0.01" onchange="calcular()"></td>
+                                    <td><input type="number" id="hues_sui" value="2" min="0" step="0.1" onchange="calcular()"></td>
+                                    <td class="currency-value" id="rt_hn_sui">0</td>
+                                    <td class="currency-value" id="rt_ing_sui">0</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td>Totales / Promedio</td>
+                                    <td class="currency-value" id="rt_habs">0</td>
+                                    <td class="currency-value" id="rt_adr">0</td>
+                                    <td class="currency-value" id="rt_ocup">0</td>
+                                    <td class="currency-value" id="rt_hues">0</td>
+                                    <td class="currency-value" id="rt_hn">0</td>
+                                    <td class="currency-value" id="rt_ing">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="column-group" style="margin-top:18px;">
                         <div class="input-group"><label>IVA servicios turísticos (%)</label><input type="number" id="iva" value="13" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Ley 9635</span></div>
                         <div class="input-group"><label>Comisión OTA / agencias (%)</label><input type="number" id="comision_ota" value="15" min="0" max="100" step="0.01" onchange="calcular()"></div>
-                        <div class="input-group"><label>Anticipo NIIF 15 aplicado (con IVA) ₡</label><input type="number" id="anticipo_aplicado" value="50000" min="0" onchange="calcular()"><span class="ref">NIIF 15 párr. 38</span></div>
-                        <div class="input-group"><label>Ingresos A&B (con IVA) ₡</label><input type="number" id="ingresos_ab" value="350000" min="0" onchange="calcular()"></div>
-                        <div class="input-group"><label>Ingresos Lavandería (con IVA) ₡</label><input type="number" id="ingresos_lav" value="56500" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>% de ventas vía OTA</label><input type="number" id="pct_ota" value="60" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Resto: venta directa</span></div>
+                        <div class="input-group"><label>Consumo A&B por huésped (sin IVA) ₡</label><input type="number" id="check_ab" value="18000" min="0" onchange="calcular()"><span class="ref">Check average</span></div>
+                        <div class="input-group"><label>Gasto lavandería por huésped (sin IVA) ₡</label><input type="number" id="gasto_lav" value="2500" min="0" onchange="calcular()"></div>
+                        <div class="input-group"><label>% de reservas con anticipo</label><input type="number" id="pct_reservas_anticipo" value="30" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">NIIF 15 párr. 106</span></div>
+                        <div class="input-group"><label>% del total pagado por anticipado</label><input type="number" id="pct_anticipo" value="50" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">NIIF 15 párr. 38</span></div>
                     </div>
                 </div>
 
@@ -592,6 +704,17 @@
                         <div class="input-group"><label>Préstamo LP — saldo inicial ₡</label><input type="number" id="prestamo_ini" value="2400000" min="0" onchange="calcular()"><span class="ref">NIC 23</span></div>
                         <div class="input-group"><label>Cuota — capital ₡</label><input type="number" id="cuota_capital" value="40000" min="0" onchange="calcular()"></div>
                         <div class="input-group"><label>Cuota — intereses ₡</label><input type="number" id="cuota_intereses" value="15000" min="0" onchange="calcular()"></div>
+                    </div>
+                </div>
+
+                <div id="tab_cvp" class="tab-content">
+                    <div class="info-box"><strong>Parámetros analíticos de gestión (costeo variable):</strong> Estos supuestos alimentan el módulo <em>Análisis de Costos (CVP)</em> y los indicadores de gestión. <strong>No</strong> generan asientos ni alteran los estados financieros — son herramientas de contabilidad de gestión (Arredondo; Contab. de Costos; Contab. Hotelera de Restaurantes y de Gestión).</div>
+                    <div class="column-group">
+                        <div class="input-group"><label>% Servicios públicos variable</label><input type="number" id="cvp_serv_var" value="40" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Costo mixto (resto = fijo)</span></div>
+                        <div class="input-group"><label>% Costo de ventas A&B (food cost)</label><input type="number" id="cvp_foodcost" value="32" min="0" max="100" step="0.01" onchange="calcular()"><span class="ref">Meta sector A&B 28–35%</span></div>
+                        <div class="input-group"><label>% Costo variable Lavandería</label><input type="number" id="cvp_lav_var" value="30" min="0" max="100" step="0.01" onchange="calcular()"></div>
+                        <div class="input-group"><label>Costo amenities/suministros por hab. ocupada ₡</label><input type="number" id="cvp_amenities" value="1500" min="0" step="0.01" onchange="calcular()"><span class="ref">Costo variable de habitaciones</span></div>
+                        <div class="input-group"><label>Utilidad meta mensual (después de imp.) ₡</label><input type="number" id="cvp_util_meta" value="222035" min="0" onchange="calcular()"><span class="ref">Para ventas requeridas</span></div>
                     </div>
                 </div>
             </div>
@@ -713,9 +836,9 @@
                             <tr><td class="indent-1">Ingresos lavandería (4-3-001)</td><td class="currency-value" id="er_lav">0</td></tr>
                             <tr class="subtotal-row"><td>Total ingresos por contratos con clientes (NIIF 15)</td><td class="currency-value" id="er_ing_total">0</td></tr>
                             <tr><td class="indent-1 neg">(-) Comisiones OTA (5-5-001)</td><td class="currency-value neg" id="er_comisiones">0</td></tr>
-                            <tr><td class="indent-1 neg">(-) Personal Habitaciones 60% (5-1-001)</td><td class="currency-value neg" id="er_per_hab">0</td></tr>
-                            <tr><td class="indent-1 neg">(-) Personal A&B 25% (5-1-002)</td><td class="currency-value neg" id="er_per_ab">0</td></tr>
-                            <tr><td class="indent-1 neg">(-) Personal Administración 15% (5-1-003)</td><td class="currency-value neg" id="er_per_adm">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Personal Habitaciones (5-1-001) <span id="er_per_hab_pct" style="color:#999;font-size:11px;"></span></td><td class="currency-value neg" id="er_per_hab">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Personal A&B (5-1-002) <span id="er_per_ab_pct" style="color:#999;font-size:11px;"></span></td><td class="currency-value neg" id="er_per_ab">0</td></tr>
+                            <tr><td class="indent-1 neg">(-) Personal Administración (5-1-003) <span id="er_per_adm_pct" style="color:#999;font-size:11px;"></span></td><td class="currency-value neg" id="er_per_adm">0</td></tr>
                             <tr><td class="indent-1 neg">(-) Cargas sociales patronales (5-2-001)</td><td class="currency-value neg" id="er_ccss">0</td></tr>
                             <tr><td class="indent-1 neg">(-) Servicios públicos (5-3-001)</td><td class="currency-value neg" id="er_serv">0</td></tr>
                             <tr><td class="indent-1 neg">(-) Depreciación Edificio (5-4-001)</td><td class="currency-value neg" id="er_dep_edif">0</td></tr>
@@ -862,6 +985,14 @@
                     <div class="kpi-card"><div class="kpi-label">ROA</div><div class="kpi-value"><span id="kpi_roa">0%</span></div><div class="bench">Benchmark: &gt; 5%</div></div>
                     <div class="kpi-card"><div class="kpi-label">ROE</div><div class="kpi-value"><span id="kpi_roe">0%</span></div><div class="bench">Benchmark: &gt; 15%</div></div>
                 </div>
+                <h2 style="font-size:15px;margin-top:6px;">Desglose por tipo de habitación</h2>
+                <div class="info-box" style="font-size:11.5px;">ADR e ingresos por tipo (Sencilla / Doble / Suite) y su participación en el ingreso de hospedaje (mix). Fuente: tabla de la pestaña Operación.</div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Tipo</th><th>Hab-noche</th><th>Ocupación %</th><th>ADR ₡</th><th>Ingreso neto ₡</th><th>Huéspedes</th><th>% mix ingreso</th></tr></thead>
+                        <tbody id="kpi_tipos_body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -880,6 +1011,95 @@
             </div>
         </div>
 
+        <!-- ===== ANÁLISIS DE COSTOS (CVP) ===== -->
+        <div id="view-costos" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right">
+                    <button class="btn-action" onclick="openView('view-params');switchSubTabById('tab_cvp')">✎ Editar supuestos CVP</button>
+                    <button class="btn-action" onclick="openView('view-kpis')">📈 Ver KPIs</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h2>🧮 Análisis de Costos — Costo-Volumen-Utilidad (CVP)</h2>
+                <div class="info-box">
+                    <strong>Contabilidad de gestión.</strong> Reclasifica los costos operativos del Estado de Resultados en <strong>fijos</strong> y <strong>variables</strong> (costeo variable) para calcular el <em>margen de contribución</em>, el <em>punto de equilibrio</em> y el <em>apalancamiento operativo</em>. Fuentes: <em>Contabilidad y Análisis de Costos</em> (M. Arredondo), <em>Contabilidad de Costos</em>, <em>Contabilidad Fundamentos y Usos</em>, y <em>Contabilidad Hotelera, de Restaurantes y de Gestión</em>. El resultado operativo del CVP reconcilia con el del Estado de Resultados (IFRS 18).
+                </div>
+
+                <h2 style="font-size:15px;margin-top:6px;">1 · Clasificación de costos operativos</h2>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Costo operativo</th><th>Naturaleza</th><th>Fijo (₡)</th><th>Variable (₡)</th></tr></thead>
+                        <tbody id="costos_clasif_body"></tbody>
+                        <tfoot>
+                            <tr class="total-row"><td colspan="2"><strong>TOTALES</strong></td><td class="currency-value" id="cc_cf">0</td><td class="currency-value" id="cc_cv">0</td></tr>
+                            <tr class="subtotal-row"><td colspan="2">Costo operativo total</td><td class="currency-value" colspan="2" id="cc_total">0</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="warn-box" style="font-size:11.5px;">El costo de ventas de A&B, la lavandería variable y los amenities son <strong>indicadores de gestión analíticos</strong> (costeo variable, no posteados al Diario por la simplificación NIC 2 del ejercicio). El subtotal operativo financiero usa únicamente los gastos del Estado de Resultados.</div>
+
+                <h2 style="font-size:15px;">2 · Margen de contribución y punto de equilibrio (global, en ₡)</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card"><div class="kpi-label">Ventas operativas</div><div class="kpi-value">₡<span id="cvp_ventas">0</span></div></div>
+                    <div class="kpi-card"><div class="kpi-label">Margen de contribución</div><div class="kpi-value">₡<span id="cvp_mc">0</span></div><div class="note">Ventas − Costos variables</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Razón de contribución (RMC)</div><div class="kpi-value"><span id="cvp_rmc">0%</span></div><div class="note">MC / Ventas</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Punto de equilibrio</div><div class="kpi-value">₡<span id="cvp_pe_col">0</span></div><div class="note">Costos fijos / RMC</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Margen de seguridad</div><div class="kpi-value"><span id="cvp_ms_pct">0%</span></div><div class="note">₡<span id="cvp_ms_col">0</span> sobre el equilibrio</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Apalancamiento operativo (GAO)</div><div class="kpi-value"><span id="cvp_gao">0</span>×</div><div class="note">MC / Resultado operativo</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Ventas p/ utilidad meta</div><div class="kpi-value">₡<span id="cvp_ventas_meta">0</span></div><div class="note">(CF + meta antes de imp.) / RMC</div></div>
+                </div>
+
+                <h2 style="font-size:15px;">3 · Punto de equilibrio del departamento Habitaciones</h2>
+                <div class="info-box" style="font-size:11.5px;">Economía por <strong>noche-habitación</strong> (contribución unitaria) y <strong>ocupación de equilibrio del hotel</strong>. La ocupación de equilibrio se deriva del CVP global asumiendo que los ingresos totales varían con la ocupación, por lo que reconcilia con el margen de seguridad. Ref.: <em>Contab. Hotelera</em>, p. 286-290.</div>
+                <div class="kpi-grid">
+                    <div class="kpi-card"><div class="kpi-label">ADR neto / noche</div><div class="kpi-value">₡<span id="cvp_adr">0</span></div></div>
+                    <div class="kpi-card"><div class="kpi-label">Costo variable / noche</div><div class="kpi-value">₡<span id="cvp_cv_unit">0</span></div><div class="note">Comisión OTA + amenities</div></div>
+                    <div class="kpi-card"><div class="kpi-label">MC por noche-habitación</div><div class="kpi-value">₡<span id="cvp_mc_unit">0</span></div></div>
+                    <div class="kpi-card"><div class="kpi-label">PE (noches-habitación)</div><div class="kpi-value"><span id="cvp_pe_noches">0</span></div></div>
+                    <div class="kpi-card"><div class="kpi-label">% Ocupación de equilibrio</div><div class="kpi-value"><span id="cvp_pe_ocup">0%</span></div><div class="bench" id="cvp_pe_ocup_bench">vs ocupación real</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Holgura de ocupación</div><div class="kpi-value"><span id="cvp_holgura">0 pp</span></div><div class="note">Real − equilibrio</div></div>
+                </div>
+
+                <h2 style="font-size:15px;">4 · Indicadores de costo hoteleros</h2>
+                <div class="kpi-grid">
+                    <div class="kpi-card"><div class="kpi-label">Costo operativo / hab. ocupada</div><div class="kpi-value">₡<span id="cvp_costo_hab">0</span></div><div class="note">Gastos operativos / noches vendidas</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Food cost % A&B</div><div class="kpi-value"><span id="cvp_foodcost_real">0%</span></div><div class="bench">Meta sector: 28% – 35%</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Razón de costo variable</div><div class="kpi-value"><span id="cvp_rcv">0%</span></div><div class="note">CV / Ventas</div></div>
+                    <div class="kpi-card"><div class="kpi-label">Razón de costo fijo</div><div class="kpi-value"><span id="cvp_rcf">0%</span></div><div class="note">CF / Ventas</div></div>
+                </div>
+
+                <h2 style="font-size:15px;">5 · Rentabilidad departamental y GOP (USALI)</h2>
+                <div class="info-box" style="font-size:11.5px;">Estructura USALI 11.ª Ed.: utilidades departamentales − gastos no distribuidos = <strong>GOP</strong>; menos cargos fijos a la propiedad (depreciación) e intereses = resultado. Las cifras de A&B incluyen el food cost analítico.</div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Concepto USALI</th><th>Ingresos (₡)</th><th>Costos/Gastos (₡)</th><th>Resultado (₡)</th></tr></thead>
+                        <tbody id="gop_body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CUMPLIMIENTO NIIF ===== -->
+        <div id="view-niif" class="view">
+            <div class="view-toolbar">
+                <button class="btn-back" onclick="goHome()">← Volver al menú principal</button>
+                <div class="toolbar-right"><button class="btn-action" onclick="openView('view-legal')">📚 Marco Normativo</button></div>
+            </div>
+            <div class="panel">
+                <h2>📐 Tablero de Cumplimiento NIIF y Contabilidad Hotelera</h2>
+                <div class="info-box">
+                    Revisión del ejercicio contra las <strong>NIIF Completas 2023</strong> e <strong>IFRS 18</strong>. <span style="color:#10b981;font-weight:700;">●</span> Cumple · <span style="color:#f59e0b;font-weight:700;">●</span> Simplificación didáctica (correcto a nivel académico, ampliable) · <span style="color:#3b82f6;font-weight:700;">●</span> Mejora recomendada para uso profesional.
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th style="width:130px">Norma</th><th>Requisito</th><th>Tratamiento en la herramienta</th><th style="width:90px">Estado</th></tr></thead>
+                        <tbody id="niif_body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- ===== MARCO NORMATIVO ===== -->
         <div id="view-legal" class="view">
             <div class="view-toolbar"><button class="btn-back" onclick="goHome()">← Volver al menú principal</button></div>
@@ -889,7 +1109,11 @@
                     <div class="legal-card"><strong>IFRS 18 — Presentación y Revelación en EEFF</strong><span>Vigente desde 1-ene-2027. Estructura el ER en categorías: Operativa, Inversión, Financiación e Impuestos.</span></div>
                     <div class="legal-card"><strong>NIIF 15 — Ingresos por contratos con clientes</strong><span>Anticipos como pasivo (ingreso diferido). Reconocimiento al transferir control del servicio.</span></div>
                     <div class="legal-card"><strong>NIC 16 — Propiedades, planta y equipo</strong><span>Modelo del costo. Depreciación lineal mensual.</span></div>
-                    <div class="legal-card"><strong>NIC 23 — Costos por préstamos</strong><span>Intereses como gasto del período en la categoría de financiación.</span></div>
+                    <div class="legal-card"><strong>NIC 23 — Costos por préstamos</strong><span>Intereses como gasto del período en la categoría de financiación. Se capitalizan solo si el activo califica (período sustancial de construcción).</span></div>
+                    <div class="legal-card"><strong>NIC 2 — Inventarios</strong><span>Suministros y mercadería A&B medidos al costo o VNR, el menor (párr. 9). El costo se reconoce como gasto al consumirse (párr. 34). Inventario de suministros registrado en cta. 1-3-001.</span></div>
+                    <div class="legal-card"><strong>NIC 12 — Impuesto a las ganancias</strong><span>Impuesto corriente reconocido (cta. 2-6-001). El impuesto diferido por diferencias temporarias (depreciación fiscal vs. contable) se omite por simplificación didáctica.</span></div>
+                    <div class="legal-card"><strong>NIC 37 — Provisiones</strong><span>Aguinaldo y vacaciones son obligaciones legales en CR que deberían provisionarse mensualmente. El ejercicio actual no las incluye (nota didáctica — ver Cumplimiento NIIF).</span></div>
+                    <div class="legal-card"><strong>NIC 36 — Deterioro de activos</strong><span>Requiere prueba de deterioro ante indicios. No aplicable en este período (activos nuevos, sin indicios).</span></div>
                     <div class="legal-card"><strong>Ley 7092 — Impuesto sobre la Renta</strong><span>Tasa empresarial 30% (art. 15). Tramos progresivos asalariados Min. Hacienda 2026.</span></div>
                     <div class="legal-card"><strong>Ley 9635 — Fortalecimiento Finanzas Públicas</strong><span>IVA general 13% sobre servicios turísticos. Mecanismo débito/crédito fiscal.</span></div>
                     <div class="legal-card"><strong>CNPT — Normas y Procedimientos Tributarios</strong><span>Obligaciones formales y materiales del contribuyente.</span></div>
@@ -898,6 +1122,8 @@
                     <div class="legal-card"><strong>USALI 11.ª Edición</strong><span>Estructura departamental Habitaciones / A&B / Admin.</span></div>
                     <div class="legal-card"><strong>Contabilidad Básica para PYMES</strong><span>Convenciones de formato: comprobante por asiento, numeración de líneas, saldo corrido en Mayor, sumas y saldos en Balance de Comprobación.</span></div>
                     <div class="legal-card"><strong>Asientos de Diario — Contabilidad Básica</strong><span>Naturaleza de cuentas: Activos y Gastos son deudores; Pasivos, Patrimonio e Ingresos son acreedores. Verificación automática en este sistema.</span></div>
+                    <div class="legal-card"><strong>Bibliografía de costos</strong><span>Contabilidad y Análisis de Costos (M. Arredondo) · Contabilidad de Costos · Contabilidad Fundamentos y Usos · Casos Prácticos de Costos. Base del módulo CVP: clasificación de costos, margen de contribución, punto de equilibrio, apalancamiento.</span></div>
+                    <div class="legal-card"><strong>Contabilidad Hotelera, de Restaurantes y de Gestión</strong><span>Estructura departamental USALI, GOP, costo por habitación ocupada, food cost %, punto de equilibrio en habitaciones (p. 286-290) y ratios de gestión hotelera.</span></div>
                 </div>
             </div>
         </div>
@@ -964,13 +1190,29 @@
         }
         function goHome() { openView('view-home'); }
         function switchSubTab(ev, tabId) {
-            const tabsContainer = ev.target.parentElement;
+            const button = ev.currentTarget;
+            if (!button) return;
+            const tabsContainer = button.parentElement;
             const contentRoot   = tabsContainer.parentElement;
             tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            ev.target.classList.add('active');
+            button.classList.add('active');
             contentRoot.querySelectorAll(':scope > .tab-content').forEach(c => c.classList.remove('active'));
             const el = document.getElementById(tabId);
             if (el) el.classList.add('active');
+        }
+        function switchSubTabById(tabId) {
+            const content = document.getElementById(tabId);
+            if (!content) return;
+            const contentRoot = content.parentElement;
+            const tabsContainer = contentRoot.querySelector('.tabs');
+            if (tabsContainer) {
+                tabsContainer.querySelectorAll('.tab').forEach(t => {
+                    const on = t.getAttribute('onclick') || '';
+                    t.classList.toggle('active', on.includes("'" + tabId + "'"));
+                });
+            }
+            contentRoot.querySelectorAll(':scope > .tab-content').forEach(c => c.classList.remove('active'));
+            content.classList.add('active');
         }
 
         // ==================== UTILIDADES ====================
@@ -992,7 +1234,8 @@
             const el = document.getElementById(id);
             if (el) el.textContent = value;
         }
-        function r2(n) { return Math.round(n * 100) / 100; }
+        // Acota un valor numérico a un rango [min, max] (validación defensiva de inputs)
+        function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
 
         function calcularISRSalarial(salarioBruto) {
             let isr = 0;
@@ -1024,14 +1267,16 @@
             const entries = [];
 
             // AST-000 — Registro de activos fijos
+            // Permite financiación parcial: si prestamoIni < costoEdif, el resto se paga con banco
+            const bancoActivos = d.costoMob + (d.costoEdif - d.prestamoIni);
             entries.push(asiento("AST-000", "01/07/2026", "Registro activos fijos",
                 "Edificio financiado con préstamo LP; mobiliario al contado · NIC 16",
                 "Esc. compraventa 001 / Fact. 0125",
                 [
                     { c: "1-6-001", d: d.costoEdif, h: 0 },
                     { c: "1-7-001", d: d.costoMob,  h: 0 },
-                    { c: "1-1-001", d: 0,           h: d.costoMob },
-                    { c: "2-7-001", d: 0,           h: d.costoEdif }
+                    { c: "1-1-001", d: 0,           h: bancoActivos },
+                    { c: "2-7-001", d: 0,           h: d.prestamoIni }
                 ]));
 
             entries.push(asiento("AST-001", "01/07/2026", "Aportación de capital inicial",
@@ -1052,7 +1297,7 @@
                 ]));
 
             entries.push(asiento("AST-003", "05/07/2026", "Anticipo de reservación recibido",
-                "Anticipo registrado como pasivo · NIIF 15 párr. 106",
+                "Anticipo de las reservas con pago adelantado, registrado como pasivo de contrato · NIIF 15 párr. 106",
                 "Recibo de dinero 001",
                 [
                     { c: "1-1-001", d: d.anticipoBruto, h: 0 },
@@ -1060,26 +1305,27 @@
                 ]));
 
             entries.push(asiento("AST-004", "10/07/2026", "Venta de hospedaje al contado",
-                "Habitaciones vendidas + IVA débito 13% · NIIF 15 / Ley 9635",
-                "Fact. electrónica F-1001 a F-1016",
+                "Reservas pagadas en su totalidad al check-in + IVA débito · NIIF 15 / Ley 9635",
+                "Fact. electrónica F-1001 …",
                 [
-                    { c: "1-1-001", d: d.hospedajeBruto, h: 0 },
-                    { c: "4-1-001", d: 0, h: d.hospedajeNeto },
-                    { c: "2-2-001", d: 0, h: d.hospedajeIva }
+                    { c: "1-1-001", d: d.contadoBruto, h: 0 },
+                    { c: "4-1-001", d: 0, h: d.contadoNeto },
+                    { c: "2-2-001", d: 0, h: d.contadoIva }
                 ]));
 
-            entries.push(asiento("AST-005", "12/07/2026", "Aplicación del anticipo al check-in",
-                "Desreconocimiento del pasivo y reconocimiento del ingreso · NIIF 15 párr. 38",
-                "Fact. electrónica F-1017",
-                [
-                    { c: "2-3-001", d: d.anticipoBruto, h: 0 },
-                    { c: "4-1-001", d: 0, h: d.anticipoNeto },
-                    { c: "2-2-001", d: 0, h: d.anticipoIva }
-                ]));
+            // AST-005: aplica el anticipo previo y cobra el saldo restante al hacer check-in
+            const ast005 = [ { c: "2-3-001", d: d.anticipoBruto, h: 0 } ];
+            if (d.antRestoBruto > 0.005) ast005.push({ c: "1-1-001", d: d.antRestoBruto, h: 0 });
+            ast005.push({ c: "4-1-001", d: 0, h: d.antAplicNeto });
+            ast005.push({ c: "2-2-001", d: 0, h: d.antAplicIva });
+            entries.push(asiento("AST-005", "12/07/2026", "Check-in de reservas con anticipo",
+                "Aplica el anticipo, cobra el saldo pendiente y reconoce el ingreso · NIIF 15 párr. 38",
+                "Fact. electrónica F-1017 …",
+                ast005));
 
             entries.push(asiento("AST-006", "15/07/2026", "Ventas de alimentos y bebidas (A&B)",
-                "Ingresos restaurante/bar + IVA débito · NIIF 15 / Ley 9635",
-                "Facts. F-1018 a F-1030",
+                "Ingresos A&B derivados del consumo promedio por huésped + IVA débito · NIIF 15 / Ley 9635",
+                "Facts. F-1018 …",
                 [
                     { c: "1-1-001", d: d.abBruto, h: 0 },
                     { c: "4-2-001", d: 0, h: d.abNeto },
@@ -1087,7 +1333,7 @@
                 ]));
 
             entries.push(asiento("AST-007", "16/07/2026", "Comisión a OTA / agencias de viaje",
-                "15% sobre ingresos brutos de hospedaje · NIIF 15",
+                "Comisión sobre la porción de hospedaje vendida vía OTA · NIIF 15 (modelo principal)",
                 "Liquidación OTA Jul-2026",
                 [
                     { c: "5-5-001", d: d.comisiones, h: 0 },
@@ -1148,8 +1394,8 @@
                 ]));
 
             entries.push(asiento("AST-014", "31/07/2026", "Ingresos por lavandería",
-                "Servicio huéspedes + IVA débito · Ley 9635",
-                "Facts. F-1031 a F-1040",
+                "Ingresos de lavandería derivados del gasto por huésped + IVA débito · Ley 9635",
+                "Facts. F-1031 …",
                 [
                     { c: "1-1-001", d: d.lavBruto, h: 0 },
                     { c: "4-3-001", d: 0,          h: d.lavNeto },
@@ -1303,21 +1549,20 @@
         function calcular() {
             // ---- Inputs ----
             const p = {
-                habDisp:      getNum('hab_disp', 20),
-                ocupacion:    getNum('ocupacion'),
-                tarifa:       getNum('tarifa'),
-                iva:          getNum('iva', 13) / 100,
-                comisionOTA:  getNum('comision_ota') / 100,
-                anticipoBruto: getNum('anticipo_aplicado'),
-                ingABcIVA:    getNum('ingresos_ab'),
-                ingLavcIVA:   getNum('ingresos_lav'),
+                iva:            getNum('iva', 13) / 100,
+                comisionOTA:    getNum('comision_ota') / 100,
+                pctOTA:         clamp(getNum('pct_ota', 100), 0, 100) / 100,
+                checkAB:        getNum('check_ab'),
+                gastoLav:       getNum('gasto_lav'),
+                pctReservasAnt: clamp(getNum('pct_reservas_anticipo'), 0, 100) / 100,
+                pctAnticipo:    clamp(getNum('pct_anticipo'), 0, 100) / 100,
                 salRecep:     getNum('sal_recepcion'),
                 salGerente:   getNum('sal_gerente'),
                 gerConyuge:   getNum('ger_conyuge', 1),
                 gerHijos:     getNum('ger_hijos', 0),
-                usaliHab:     getNum('usali_hab') / 100,
-                usaliAB:      getNum('usali_ab')  / 100,
-                usaliAdm:     getNum('usali_adm') / 100,
+                usaliHab:     Math.max(0, getNum('usali_hab')) / 100,
+                usaliAB:      Math.max(0, getNum('usali_ab'))  / 100,
+                usaliAdm:     Math.max(0, getNum('usali_adm')) / 100,
                 cargaPat:     getNum('carga_patronal') / 100,
                 cargaObr:     getNum('carga_obrera')   / 100,
                 suministros:  getNum('suministros'),
@@ -1333,29 +1578,89 @@
                 cuotaInt:     getNum('cuota_intereses')
             };
 
-            // ---- Derivados básicos ----
-            const habVendidas    = Math.round(p.habDisp * p.ocupacion / 100);
-            const hospedajeNeto  = habVendidas * p.tarifa;
-            const hospedajeIva   = hospedajeNeto * p.iva;
-            const hospedajeBruto = hospedajeNeto + hospedajeIva;
+            // ---- Tipos de habitación (modelo dirigido por habitaciones y huéspedes) ----
+            const tiposHab = [
+                { key: 'sen', nombre: 'Sencilla' },
+                { key: 'dob', nombre: 'Doble' },
+                { key: 'sui', nombre: 'Suite' }
+            ].map(t => {
+                const cant   = Math.max(0, getNum('cant_' + t.key));
+                const tarifa = Math.max(0, getNum('tar_' + t.key));
+                const ocup   = clamp(getNum('ocup_' + t.key), 0, 100);
+                const hues   = Math.max(0, getNum('hues_' + t.key));
+                const habNoche = Math.round(cant * ocup / 100);
+                return { ...t, cant, tarifa, ocup, hues, habNoche,
+                         ingreso: habNoche * tarifa, huespedes: habNoche * hues };
+            });
+            const habDispTotal  = tiposHab.reduce((s, t) => s + t.cant, 0);
+            const habVendidas   = tiposHab.reduce((s, t) => s + t.habNoche, 0);
+            const hospedajeNeto = tiposHab.reduce((s, t) => s + t.ingreso, 0);
+            const huespedesTot  = tiposHab.reduce((s, t) => s + t.huespedes, 0);
+            p.habDisp   = habDispTotal;
+            p.ocupacion = habDispTotal > 0 ? (habVendidas / habDispTotal) * 100 : 0;
 
-            const anticipoNeto = p.anticipoBruto / (1 + p.iva);
-            const anticipoIva  = p.anticipoBruto - anticipoNeto;
+            // ---- Hospedaje: contado vs. con anticipo (NIIF 15) ----
+            const netoAnticipadas = hospedajeNeto * p.pctReservasAnt;     // ingreso de reservas con anticipo
+            const contadoNeto     = hospedajeNeto - netoAnticipadas;       // ingreso de reservas al contado
+            const contadoIva      = contadoNeto * p.iva;
+            const contadoBruto    = contadoNeto + contadoIva;
+            const antAplicNeto    = netoAnticipadas;                       // ingreso reconocido al check-in
+            const antAplicIva     = netoAnticipadas * p.iva;
+            const anticipoNeto    = netoAnticipadas * p.pctAnticipo;       // porción cobrada por adelantado
+            const anticipoBruto   = anticipoNeto * (1 + p.iva);
+            const antRestoBruto   = netoAnticipadas * (1 + p.iva) - anticipoBruto; // saldo cobrado al check-in
+            const roomIva         = hospedajeNeto * p.iva;                 // IVA débito total de habitaciones
 
-            const abNeto  = p.ingABcIVA / (1 + p.iva);
-            const abIva   = p.ingABcIVA - abNeto;
-            const abBruto = p.ingABcIVA;
+            // ---- A&B y Lavandería derivados del consumo por huésped ----
+            const abNeto  = huespedesTot * p.checkAB;
+            const abIva   = abNeto * p.iva;
+            const abBruto = abNeto + abIva;
+            const lavNeto  = huespedesTot * p.gastoLav;
+            const lavIva   = lavNeto * p.iva;
+            const lavBruto = lavNeto + lavIva;
 
-            const lavNeto  = p.ingLavcIVA / (1 + p.iva);
-            const lavIva   = p.ingLavcIVA - lavNeto;
-            const lavBruto = p.ingLavcIVA;
+            // ---- Comisión OTA: solo sobre la porción de hospedaje vendida vía OTA ----
+            const comisiones = hospedajeNeto * p.pctOTA * p.comisionOTA;
 
-            const comisiones = hospedajeNeto * p.comisionOTA;
+            // ---- Render tabla de tipos de habitación (pestaña Operación) ----
+            tiposHab.forEach(t => {
+                setText('rt_hn_' + t.key,  fmt(t.habNoche));
+                setText('rt_ing_' + t.key, fmt(t.ingreso));
+            });
+            const adrPonderado = habVendidas > 0 ? hospedajeNeto / habVendidas : 0;
+            setText('rt_habs', fmt(habDispTotal));
+            setText('rt_adr',  fmt(adrPonderado));
+            setText('rt_ocup', fmtPct(p.ocupacion));
+            setText('rt_hues', fmt(huespedesTot));
+            setText('rt_hn',   fmt(habVendidas));
+            setText('rt_ing',  fmt(hospedajeNeto));
+
+            // ---- Desglose por tipo de habitación (vista KPIs) ----
+            const kpiTiposBody = document.getElementById('kpi_tipos_body');
+            if (kpiTiposBody) {
+                kpiTiposBody.innerHTML = tiposHab.map(t => {
+                    const adrT = t.habNoche > 0 ? t.ingreso / t.habNoche : 0;
+                    const mix  = hospedajeNeto > 0 ? (t.ingreso / hospedajeNeto) * 100 : 0;
+                    return `<tr><td>${t.nombre}</td>
+                        <td class="currency-value">${fmt(t.habNoche)}</td>
+                        <td class="currency-value">${fmtPct(t.ocup)}</td>
+                        <td class="currency-value">${fmt(adrT)}</td>
+                        <td class="currency-value">${fmt(t.ingreso)}</td>
+                        <td class="currency-value">${fmt(t.huespedes)}</td>
+                        <td class="currency-value">${fmtPct(mix)}</td></tr>`;
+                }).join('');
+            }
 
             const planilla    = p.salRecep + p.salGerente;
-            const personalHab = planilla * p.usaliHab;
-            const personalAb  = planilla * p.usaliAB;
-            const personalAdm = planilla * p.usaliAdm;
+            // Normalización USALI: garantiza que la distribución sume exactamente la planilla
+            // (la verificación informa al usuario si los % no suman 100%)
+            const usaliRaw = p.usaliHab + p.usaliAB + p.usaliAdm;
+            const wHab = usaliRaw > 0.0001 ? p.usaliHab / usaliRaw : 1/3;
+            const wAB  = usaliRaw > 0.0001 ? p.usaliAB  / usaliRaw : 1/3;
+            const wAdm = usaliRaw > 0.0001 ? p.usaliAdm / usaliRaw : 1/3;
+            const personalHab = planilla * wHab;
+            const personalAb  = planilla * wAB;
+            const personalAdm = planilla * wAdm;
             const cargasPat   = planilla * p.cargaPat;
             const ccssObreraR = p.salRecep * p.cargaObr;
             const ccssObreraG = p.salGerente * p.cargaObr;
@@ -1370,14 +1675,18 @@
             const isrRetTotal = isrRetR + isrRetG;
             const planillaNeto = planilla - ccssObreraT - isrRetTotal;
 
-            const depEdif = (p.costoEdif / p.vidaEdif) / 12;
-            const depMob  = (p.costoMob  / p.vidaMob ) / 12;
+            // Defensiva: vida útil ≥ 1 año (evita división por cero)
+            const vidaEdifSafe = p.vidaEdif > 0 ? p.vidaEdif : 1;
+            const vidaMobSafe  = p.vidaMob  > 0 ? p.vidaMob  : 1;
+            const depEdif = (p.costoEdif / vidaEdifSafe) / 12;
+            const depMob  = (p.costoMob  / vidaMobSafe ) / 12;
 
             const suministrosIva = p.suministros * p.iva;
             const serviciosIva   = p.servicios * p.iva;
 
             // ---- Resultado IFRS 18 (pre-cálculo para AST-013) ----
-            const ingresosOp = hospedajeNeto + anticipoNeto + abNeto + lavNeto;
+            // hospedajeNeto ya incluye contado + anticipadas (no se suma anticipo aparte)
+            const ingresosOp = hospedajeNeto + abNeto + lavNeto;
             const gastosOp   = comisiones + planilla + cargasPat + p.servicios + depEdif + depMob;
             const resultadoOperativo = ingresosOp - gastosOp;
             const preIsr = resultadoOperativo - p.cuotaInt;
@@ -1387,9 +1696,10 @@
             // ---- Datos para el motor contable ----
             const datos = {
                 costoEdif: p.costoEdif, costoMob: p.costoMob, capital: p.capital,
+                prestamoIni: p.prestamoIni,
                 suministros: p.suministros, suministrosIva,
-                anticipoBruto: p.anticipoBruto, anticipoNeto, anticipoIva,
-                hospedajeBruto, hospedajeNeto, hospedajeIva,
+                anticipoBruto, antAplicNeto, antAplicIva, antRestoBruto,
+                contadoNeto, contadoIva, contadoBruto,
                 abBruto, abNeto, abIva,
                 lavBruto, lavNeto, lavIva,
                 comisiones,
@@ -1458,9 +1768,12 @@
             setText('er_lav',       fmt(saldoIngLav));
             setText('er_ing_total', fmt(ingTotalER));
             setText('er_comisiones', '(' + fmt(gComisiones) + ')');
-            setText('er_per_hab',   '(' + fmt(gPerHab) + ')');
-            setText('er_per_ab',    '(' + fmt(gPerAb) + ')');
-            setText('er_per_adm',   '(' + fmt(gPerAdm) + ')');
+            setText('er_per_hab',     '(' + fmt(gPerHab) + ')');
+            setText('er_per_ab',      '(' + fmt(gPerAb)  + ')');
+            setText('er_per_adm',     '(' + fmt(gPerAdm) + ')');
+            setText('er_per_hab_pct', '(' + fmtPct(wHab * 100) + ')');
+            setText('er_per_ab_pct',  '(' + fmtPct(wAB  * 100) + ')');
+            setText('er_per_adm_pct', '(' + fmtPct(wAdm * 100) + ')');
             setText('er_ccss',      '(' + fmt(gCargas) + ')');
             setText('er_serv',      '(' + fmt(gServ) + ')');
             setText('er_dep_edif',  '(' + fmt(gDepEdif) + ')');
@@ -1535,10 +1848,10 @@
             setText('pl_tramo_g', isrG.tramoNombre);
 
             // -------- IVA --------
-            const ivaDbTotal = hospedajeIva + anticipoIva + abIva + lavIva;
+            const ivaDbTotal = roomIva + abIva + lavIva;
             const ivaCfTotal = suministrosIva + serviciosIva;
-            setText('iva_base_hosp', fmt(hospedajeNeto + anticipoNeto));
-            setText('iva_db_hosp',   fmt(hospedajeIva + anticipoIva));
+            setText('iva_base_hosp', fmt(hospedajeNeto));
+            setText('iva_db_hosp',   fmt(roomIva));
             setText('iva_base_ab',   fmt(abNeto));
             setText('iva_db_ab',     fmt(abIva));
             setText('iva_base_lav',  fmt(lavNeto));
@@ -1569,6 +1882,159 @@
             setText('kpi_roa',    fmtPct(kpiRoa));
             setText('kpi_roe',    fmtPct(kpiRoe));
 
+            // ==================== ANÁLISIS DE COSTOS (CVP) ====================
+            // Supuestos analíticos de gestión (no afectan el Diario ni los EEFF)
+            const servVarPct   = getNum('cvp_serv_var', 40) / 100;
+            const foodPct      = getNum('cvp_foodcost', 32) / 100;
+            const lavVarPct    = getNum('cvp_lav_var', 30) / 100;
+            const amenitiesUnit = getNum('cvp_amenities', 0);
+            const utilMeta     = getNum('cvp_util_meta', 0);
+
+            const nochesV   = habVendidas;
+            const servVar   = gServ * servVarPct;
+            const servFijo  = gServ - servVar;
+
+            // Clasificación de los costos operativos del Estado de Resultados
+            // Variables: comisiones OTA (escalan con ventas) + parte variable de servicios
+            // Fijos: planilla + cargas patronales + parte fija de servicios + depreciación
+            const cvFin = gComisiones + servVar;
+            const cfFin = gPerHab + gPerAb + gPerAdm + gCargas + servFijo + gDepEdif + gDepMob;
+            // Reconciliación: ingTotalER - cvFin - cfFin === resOpER
+
+            const ventasCVP = ingTotalER;
+            const mcTotal   = ventasCVP - cvFin;
+            const rmc       = ventasCVP > 0 ? mcTotal / ventasCVP : 0;
+            const peCol     = rmc > 0 ? cfFin / rmc : 0;
+            const msCol     = ventasCVP - peCol;
+            const msPct     = ventasCVP > 0 ? (msCol / ventasCVP) * 100 : 0;
+            const gao       = Math.abs(resOpER) > 0.5 ? mcTotal / resOpER : 0;
+            const metaPreTax = (1 - p.tasaISR) > 0.0001 ? utilMeta / (1 - p.tasaISR) : utilMeta;
+            const ventasMeta = rmc > 0 ? (cfFin + metaPreTax + gIntereses) / rmc : 0;
+
+            // Economía por noche-habitación (contribución unitaria del depto. Habitaciones)
+            const adrNeto = nochesV > 0 ? saldoIngHosp / nochesV : 0;
+            const cvUnit  = (nochesV > 0 ? gComisiones / nochesV : 0) + amenitiesUnit;
+            const mcUnit  = adrNeto - cvUnit;
+            // Ocupación de equilibrio del HOTEL: se deriva del CVP global asumiendo que los
+            // ingresos totales (habitaciones + A&B + lavandería) varían con la ocupación.
+            // Así reconcilia con el margen de seguridad global (evita contradicciones).
+            const peOcup   = ventasCVP > 0 ? p.ocupacion * (peCol / ventasCVP) : 0;
+            const peNoches = p.habDisp * peOcup / 100;
+            const holgura  = p.ocupacion - peOcup;
+
+            // Indicadores de costo hoteleros
+            const gastosOperTot = gComisiones + gPerHab + gPerAb + gPerAdm + gCargas + gServ + gDepEdif + gDepMob;
+            const costoHabOcup  = nochesV > 0 ? gastosOperTot / nochesV : 0;
+            const rcv = ventasCVP > 0 ? (cvFin / ventasCVP) * 100 : 0;
+            const rcf = ventasCVP > 0 ? (cfFin / ventasCVP) * 100 : 0;
+
+            // --- Render tabla de clasificación ---
+            const clasifRows = [
+                ["Comisiones OTA / agencias",   "Variable", 0,        gComisiones],
+                ["Servicios públicos",          "Mixto",    servFijo, servVar],
+                ["Personal Habitaciones",       "Fijo",     gPerHab,  0],
+                ["Personal A&B",                "Fijo",     gPerAb,   0],
+                ["Personal Administración",     "Fijo",     gPerAdm,  0],
+                ["Cargas sociales patronales",  "Fijo",     gCargas,  0],
+                ["Depreciación Edificio",       "Fijo",     gDepEdif, 0],
+                ["Depreciación Mobiliario",     "Fijo",     gDepMob,  0]
+            ];
+            document.getElementById('costos_clasif_body').innerHTML = clasifRows.map(r => `
+                <tr><td>${r[0]}</td><td>${r[1]}</td>
+                <td class="currency-value">${r[2] > 0 ? fmt(r[2]) : ''}</td>
+                <td class="currency-value">${r[3] > 0 ? fmt(r[3]) : ''}</td></tr>`).join('');
+            setText('cc_cf', fmt(cfFin));
+            setText('cc_cv', fmt(cvFin));
+            setText('cc_total', fmt(cfFin + cvFin));
+
+            // --- KPI cards CVP ---
+            setText('cvp_ventas',      fmt(ventasCVP));
+            setText('cvp_mc',          fmt(mcTotal));
+            setText('cvp_rmc',         fmtPct(rmc * 100));
+            setText('cvp_pe_col',      fmt(peCol));
+            setText('cvp_ms_pct',      fmtPct(msPct));
+            setText('cvp_ms_col',      fmt(msCol));
+            setText('cvp_gao',         (Math.round(gao * 100) / 100).toLocaleString('es-CR'));
+            setText('cvp_ventas_meta', fmt(ventasMeta));
+
+            setText('cvp_adr',       fmt(adrNeto));
+            setText('cvp_cv_unit',   fmt(cvUnit));
+            setText('cvp_mc_unit',   fmt(mcUnit));
+            setText('cvp_pe_noches', (Math.round(peNoches * 100) / 100).toLocaleString('es-CR'));
+            setText('cvp_pe_ocup',   fmtPct(peOcup));
+            setText('cvp_pe_ocup_bench', 'Ocupación real: ' + fmtPct(p.ocupacion));
+            setText('cvp_holgura',   (Math.round(holgura * 100) / 100).toLocaleString('es-CR') + ' pp');
+
+            setText('cvp_costo_hab',     fmt(costoHabOcup));
+            setText('cvp_foodcost_real', fmtPct(foodPct * 100));
+            setText('cvp_rcv',           fmtPct(rcv));
+            setText('cvp_rcf',           fmtPct(rcf));
+
+            // --- GOP departamental USALI (vista de gestión) ---
+            const foodCostAB = saldoIngAb * foodPct;
+            const amenitiesTot = amenitiesUnit * nochesV;
+            const costoHabDept = gComisiones + gPerHab + amenitiesTot;
+            const utilHab = saldoIngHosp - costoHabDept;
+            const costoAbDept = foodCostAB + gPerAb;
+            const utilAb  = saldoIngAb - costoAbDept;
+            const costoLavDept = saldoIngLav * lavVarPct;
+            const utilLav = saldoIngLav - costoLavDept;
+            const utilDeptTotal = utilHab + utilAb + utilLav;
+            const noDistribuidos = gPerAdm + gServ;
+            const gop = utilDeptTotal - noDistribuidos;
+            const propiedad = gDepEdif + gDepMob;
+            const resGestion = gop - propiedad;
+            const gopMargin = ingTotalER > 0 ? (gop / ingTotalER) * 100 : 0;
+
+            const gopRow = (concepto, ing, cost, res, cls) =>
+                `<tr class="${cls || ''}"><td>${concepto}</td>
+                 <td class="currency-value">${ing !== null ? fmt(ing) : ''}</td>
+                 <td class="currency-value">${cost !== null ? fmt(cost) : ''}</td>
+                 <td class="currency-value">${res !== null ? fmt(res) : ''}</td></tr>`;
+            document.getElementById('gop_body').innerHTML =
+                gopRow("Habitaciones", saldoIngHosp, costoHabDept, utilHab) +
+                gopRow("Alimentos y Bebidas (incl. food cost)", saldoIngAb, costoAbDept, utilAb) +
+                gopRow("Lavandería", saldoIngLav, costoLavDept, utilLav) +
+                gopRow("= Utilidades departamentales", ingTotalER, null, utilDeptTotal, "subtotal-row") +
+                gopRow("(−) Gastos no distribuidos (Admin + Servicios)", null, noDistribuidos, -noDistribuidos) +
+                gopRow("= GOP (Gross Operating Profit)", null, null, gop, "key-subtotal") +
+                gopRow("(−) Cargos a la propiedad (depreciación)", null, propiedad, -propiedad) +
+                gopRow("= Resultado operativo de gestión (USALI)", null, null, resGestion, "total-row");
+
+            // --- Tablero de cumplimiento NIIF ---
+            const otaBruto = Math.abs((saldoIngHosp + saldoIngAb + saldoIngLav) - ingTotalER) < 1; // ingresos brutos, comisión como gasto
+            const niif = [
+                ["NIIF 15", "Reconocer ingresos al transferir el control; anticipos como pasivo de contrato (párr. 106).",
+                 "Anticipo en cta. 2-3-001 y se reconoce ingreso al check-in (AST-003/005).", "ok"],
+                ["NIIF 15 B35B", "Principal vs. agente: el hotel controla la habitación → ingreso BRUTO; comisión OTA como gasto.",
+                 "Ingreso bruto en 4-1-001 y comisión OTA como gasto 5-5-001 (modelo principal). " + (otaBruto ? "✓ Verificado." : "Revisar."), otaBruto ? "ok" : "warn"],
+                ["NIC 2", "Inventarios al costo o VNR el menor; gasto al consumir (párr. 9, 34).",
+                 "Suministros capitalizados en 1-3-001. El consumo periódico y el costo de ventas A&B se tratan como indicador de gestión (CVP) — simplificación didáctica.", "warn"],
+                ["NIC 16", "Costo, depreciación lineal, revisión anual de vida útil y valor residual (párr. 50-51).",
+                 "Depreciación lineal mensual (AST-011/012). Vida útil parametrizable; valor residual = 0.", "ok"],
+                ["NIC 23", "Intereses del período como gasto; capitalizar solo activos calificados (párr. 8-11).",
+                 "Intereses como gasto de financiación 5-7-001 (AST-015). Activo no calificado.", "ok"],
+                ["IFRS 18", "Categorías Operativa/Inversión/Financiación/Impuestos y subtotales obligatorios (párr. 69-72).",
+                 "ER presenta Resultado Operativo y Resultado antes de financiación e impuestos.", "ok"],
+                ["NIC 12", "Reconocer impuesto corriente y diferido por diferencias temporarias.",
+                 "Impuesto corriente 30% en 2-6-001. Impuesto diferido omitido (mejora para uso profesional).", "info"],
+                ["NIC 37", "Provisionar obligaciones legales presentes (aguinaldo, vacaciones).",
+                 "No incluido en este período. Recomendado: provisión mensual de aguinaldo (8.33%) y vacaciones.", "info"],
+                ["NIC 36", "Prueba de deterioro ante indicios.",
+                 "Sin indicios en el período (activos nuevos). No aplica.", "ok"]
+            ];
+            const niifColor = { ok: "#10b981", warn: "#f59e0b", info: "#3b82f6" };
+            const niifTxt   = { ok: "Cumple", warn: "Simplif.", info: "Recomend." };
+            document.getElementById('niif_body').innerHTML = niif.map(n => `
+                <tr>
+                    <td><strong>${n[0]}</strong></td>
+                    <td style="font-size:11.5px;color:#666;">${n[1]}</td>
+                    <td style="font-size:11.5px;">${n[2]}</td>
+                    <td><span style="color:${niifColor[n[3]]};font-weight:700;">● ${niifTxt[n[3]]}</span></td>
+                </tr>`).join('');
+
+            const cvpReconcilia = Math.abs((ventasCVP - cvFin - cfFin) - resOpER) < 1;
+
             // -------- VERIFICACIONES --------
             const ivaPct = p.iva * 100;
             const usaliSum = p.usaliHab + p.usaliAB + p.usaliAdm;
@@ -1591,14 +2057,18 @@
                 { ok: cuentasFueraDeNaturaleza.length === 0, label: "Saldos conformes a naturaleza (Activos deudores, Pasivos acreedores)", val: cuentasFueraDeNaturaleza.length === 0 ? "Todas correctas" : "Fuera: " + cuentasFueraDeNaturaleza.join(", ") },
                 { ok: Math.abs(difESF) < 1, label: "Ecuación contable: Activo = Pasivo + Patrimonio", val: "Δ = ₡" + fmt(Math.abs(difESF)) },
                 { ok: Math.abs(usaliSum - 1) < 0.0001, label: "Distribución USALI suma 100%", val: fmtPct(usaliSum * 100) },
-                { ok: ivaPct === 13,   label: "IVA tarifa general 13% (Ley 9635)", val: fmtPct(ivaPct) },
+                { ok: Math.abs(ivaPct - 13) < 0.001, label: "IVA tarifa general 13% (Ley 9635)", val: fmtPct(ivaPct) },
                 { ok: Math.abs(p.cargaPat - 0.2683) < 0.0005, label: "Carga patronal CCSS 26.83%", val: fmtPct(p.cargaPat * 100) },
                 { ok: Math.abs(p.cargaObr - 0.1083) < 0.0005, label: "Retención obrera CCSS 10.83%", val: fmtPct(p.cargaObr * 100) },
                 { ok: Math.abs(p.tasaISR - 0.30) < 0.0005,    label: "ISR empresarial 30% (Ley 7092 art. 15)", val: fmtPct(p.tasaISR * 100) },
-                { ok: Math.abs(depEdif - p.costoEdif / p.vidaEdif / 12) < 1, label: "Depreciación Edificio (NIC 16)", val: "₡" + fmt(depEdif) },
-                { ok: Math.abs(depMob - p.costoMob / p.vidaMob / 12) < 1,    label: "Depreciación Mobiliario (NIC 16)", val: "₡" + fmt(depMob) },
+                { ok: Math.abs(depEdif - p.costoEdif / vidaEdifSafe / 12) < 1, label: "Depreciación Edificio (NIC 16)", val: "₡" + fmt(depEdif) },
+                { ok: Math.abs(depMob - p.costoMob / vidaMobSafe / 12) < 1,    label: "Depreciación Mobiliario (NIC 16)", val: "₡" + fmt(depMob) },
                 { ok: isrEmpresa >= 0, label: "ISR empresa ≥ 0 (no aplica con pérdida)", val: "₡" + fmt(isrEmpresa) },
-                { ok: true, label: "IFRS 18: Resultado Operativo presentado", val: "₡" + fmt(resOpER) }
+                { ok: true, label: "IFRS 18: Resultado Operativo presentado", val: "₡" + fmt(resOpER) },
+                { ok: cvpReconcilia, label: "CVP reconcilia con ER (Ventas − CV − CF = Result. operativo)", val: "₡" + fmt(resOpER) },
+                { ok: rmc > 0 && rmc <= 1, label: "Razón de margen de contribución válida (0–100%)", val: fmtPct(rmc * 100) },
+                { ok: holgura >= 0, label: "Ocupación real ≥ punto de equilibrio (margen de seguridad)", val: "Equilibrio: " + fmtPct(peOcup) },
+                { ok: otaBruto, label: "NIIF 15: ingresos brutos + comisión OTA como gasto (principal)", val: otaBruto ? "Correcto" : "Revisar" }
             ];
             const ul = document.getElementById('verif_list');
             ul.innerHTML = verif.map(v => `
@@ -1612,46 +2082,50 @@
 
         // ==================== RESET / EJEMPLO ====================
         const DEFAULTS_EJEMPLO = {
-            hab_disp: 20, ocupacion: 80, tarifa: 120000, iva: 13, comision_ota: 15,
-            anticipo_aplicado: 50000, ingresos_ab: 350000, ingresos_lav: 56500,
+            cant_sen: 10, tar_sen: 90000, ocup_sen: 80, hues_sen: 1,
+            cant_dob: 8, tar_dob: 120000, ocup_dob: 80, hues_dob: 2,
+            cant_sui: 2, tar_sui: 200000, ocup_sui: 70, hues_sui: 2,
+            iva: 13, comision_ota: 15, pct_ota: 60,
+            check_ab: 18000, gasto_lav: 2500,
+            pct_reservas_anticipo: 30, pct_anticipo: 50,
             sal_recepcion: 350000, sal_gerente: 950000, ger_conyuge: 1, ger_hijos: 0,
             usali_hab: 60, usali_ab: 25, usali_adm: 15,
             carga_patronal: 26.83, carga_obrera: 10.83,
             suministros: 25000, servicios: 42000,
             costo_edif: 2400000, vida_edif: 40, costo_mob: 960000, vida_mob: 10,
             capital: 8000000, tasa_isr: 30,
-            prestamo_ini: 2400000, cuota_capital: 40000, cuota_intereses: 15000
+            prestamo_ini: 2400000, cuota_capital: 40000, cuota_intereses: 15000,
+            cvp_serv_var: 40, cvp_foodcost: 32, cvp_lav_var: 30, cvp_amenities: 1500, cvp_util_meta: 0
         };
+        // "Limpiar valores" pone en 0 TODOS los campos EXCEPTO estas tasas legales/normativas,
+        // que se conservan para no tener que reescribirlas (IVA, CCSS patronal/obrera, ISR empresa).
+        // Los supuestos del ejercicio (USALI, vida útil, food cost, amenities) sí se limpian a 0.
         const VALORES_LEGALES_MINIMOS = {
-            iva: 13, carga_patronal: 26.83, carga_obrera: 10.83, tasa_isr: 30,
-            usali_hab: 60, usali_ab: 25, usali_adm: 15,
-            vida_edif: 40, vida_mob: 10, ger_conyuge: 0, ger_hijos: 0
+            iva: 13, carga_patronal: 26.83, carga_obrera: 10.83, tasa_isr: 30
         };
 
-        function cargarEjemplo() {
-            let cambiados = 0;
-            Object.keys(DEFAULTS_EJEMPLO).forEach(k => {
-                const el = document.getElementById(k);
-                if (el) {
-                    el.value = String(DEFAULTS_EJEMPLO[k]);
-                    el.dispatchEvent(new Event('change', { bubbles: true }));
-                    cambiados++;
-                }
-            });
-            calcular();
-            mostrarToast('📋 Datos del ejemplo cargados (' + cambiados + ' campos)');
-        }
-        function limpiarValores() {
-            let limpiados = 0;
+        // Aplica un conjunto de valores a los inputs y recalcula UNA sola vez.
+        // (Antes se disparaba un evento 'change' por campo, lo que ejecutaba calcular()
+        //  ~30 veces de forma redundante reconstruyendo el DOM en cada iteración.)
+        function aplicarValores(fuente, fallback) {
+            let aplicados = 0;
             Object.keys(DEFAULTS_EJEMPLO).forEach(k => {
                 const el = document.getElementById(k);
                 if (!el) return;
-                el.value = String(k in VALORES_LEGALES_MINIMOS ? VALORES_LEGALES_MINIMOS[k] : 0);
-                el.dispatchEvent(new Event('change', { bubbles: true }));
-                limpiados++;
+                const valor = k in fuente ? fuente[k] : fallback;
+                el.value = String(valor);
+                aplicados++;
             });
             calcular();
-            mostrarToast('🧹 ' + limpiados + ' valores limpiados (tarifas legales conservadas)');
+            return aplicados;
+        }
+        function cargarEjemplo() {
+            const n = aplicarValores(DEFAULTS_EJEMPLO, 0);
+            mostrarToast('📋 Datos del ejemplo cargados (' + n + ' campos)');
+        }
+        function limpiarValores() {
+            const n = aplicarValores(VALORES_LEGALES_MINIMOS, 0);
+            mostrarToast('🧹 ' + n + ' campos limpiados (solo tasas legales conservadas)');
         }
         function mostrarToast(mensaje) {
             const existente = document.getElementById('toast');
@@ -1674,7 +2148,32 @@
             }, 2200);
         }
 
-        window.addEventListener('load', calcular);
+        // Inyecta un botón "Imprimir / PDF" en cada vista de reporte (evita duplicar markup).
+        // window.print() respeta el bloque @media print: exporta solo la vista activa.
+        function injectPrintButtons() {
+            document.querySelectorAll('.view').forEach(view => {
+                if (view.id === 'view-home') return;
+                const toolbar = view.querySelector('.view-toolbar');
+                if (!toolbar) return;
+                let right = toolbar.querySelector('.toolbar-right');
+                if (!right) {
+                    right = document.createElement('div');
+                    right.className = 'toolbar-right';
+                    toolbar.appendChild(right);
+                }
+                const btn = document.createElement('button');
+                btn.className = 'btn-action secondary btn-print';
+                btn.type = 'button';
+                btn.textContent = '🖨 Imprimir / PDF';
+                btn.addEventListener('click', () => window.print());
+                right.appendChild(btn);
+            });
+        }
+
+        window.addEventListener('load', () => {
+            injectPrintButtons();
+            calcular();
+        });
     </script>
 </body>
 </html>
